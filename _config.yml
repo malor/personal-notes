@@ -1,0 +1,27 @@
+site:
+  title: Roman Podoliaka's Blog
+  author: Roman Podoliaka
+  url: http://podoliaka.org/
+
+theme:
+  navigation: !!pairs
+    - about: /about
+    - talks: /talks
+    - CV: https://dl.dropbox.com/u/1543929/cv.pdf
+    - feed: /feed.xml
+
+  counters:
+    google_analytics: UA-37812430-1
+    yandex_metrika: 20683150
+
+  copyright: >
+    &copy; 2016 Roman Podoliaka
+
+ext:
+  enabled:
+    - markdown
+    - restructuredtext
+    - index
+    - feed
+    - sitemap
+    - tags

@@ -1,0 +1,50 @@
+---
+author: Roman Podoliaka
+---
+
+About me
+========
+
+Hey! I'm Roman, a software engineer from Kharkiv, Ukraine.
+
+Currently I'm working as a development manager at [Mirantis Inc.], where I'm leading
+a team of engineers focused on making [OpenStack Nova] better in terms of performance,
+upgradability, scalability and stability.
+
+My programming language of choice is Python, as it allows me to be efficient and easily
+express my thoughts. I used to do some C / C++ / Java programming before and keep using
+these languages, but usually only when I need to read or modify someone else's code.
+I'm also a big fan of Clojure (from pragmatic perspective) and Haskell (from aesthetic
+perspective), as well as functional programming in general.
+
+My main areas of expertise are:
+
+* troubleshooting
+
+* system programming
+
+* (relational) databases
+
+[Mirantis Inc.]: https://www.mirantis.com/
+[OpenStack Nova]: http://docs.openstack.org/developer/nova/
+
+
+Short bio:
+----------
+
+* __Name__: Roman Podoliaka
+* __Nickname__: malor
+* __Age__: 25
+* __Gender__: Male
+* __Location__: Kharkiv, Ukraine
+
+
+Contact
+-------
+
+If you want to reach out to me, you're welcome to send an [E-mail] or follow me on [Twitter],
+or [GitHub].
+
+[E-mail]: mailto:roman.podoliaka@gmail.com
+[Twitter]: https://twitter.com/rpodoliaka
+[GitHub]: https://github.com/malor
