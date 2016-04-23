@@ -4,6 +4,10 @@ Talks
 2016
 ----
 
+*CPU profiling of Python applications* at [PyCon UA] 2016: [slides][profiling_slides_uapycon]
+[profiling_slides_uapycon]: http://podoliaka.org/talks/profiling/
+
+
 *CPU profiling of Python applications* at [KharkivPy] #12 (Kharkiv, Ukraine): [video][profiling_video], [slides][profiling_slides]
 [profiling_video]: https://www.youtube.com/watch?v=KcvsJ1jvirA
 [profiling_slides]: https://dl.dropboxusercontent.com/u/1543929/kharkivpy-profiling.tar.gz
@@ -17,3 +21,4 @@ Talks
 
 
 [KharkivPy]: http://kharkivpy.org.ua/
+[PyCon UA]: http://ua.pycon.org/
