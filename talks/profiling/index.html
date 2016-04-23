@@ -1140,7 +1140,7 @@ html {
 }
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 20px;
   line-height: 1.42857143;
   color: #000;
   background-color: #fff;
@@ -11758,6 +11758,9 @@ ul.typeahead-list > li > a {
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
 }
 .reveal pre code {
+  max-width: 1000px;
+  max-height: 800px;
+  font-size: 70%;
   padding: 0px;
 }
 .reveal section img {
@@ -11771,6 +11774,7 @@ ul.typeahead-list > li > a {
 }
 .reveal .slides {
   text-align: left;
+  width: 1300px !important;
 }
 .reveal.fade {
   opacity: 1;
@@ -12350,13 +12354,9 @@ Although practicality beats purity.
 Errors should never pass silently.
 Unless explicitly silenced.
 In the face of ambiguity, refuse the temptation to guess.
-There should be one-- and preferably only one --obvious way to do it.
-Although that way may not be obvious at first unless you're Dutch.
-Now is better than never.
-Although never is often better than *right* now.
-If the implementation is hard to explain, it's a bad idea.
-If the implementation is easy to explain, it may be a good idea.
-Namespaces are one honking great idea -- let's do more of those!</code></pre>
+...
+
+</code></pre>
 
 </div>
 </div>
@@ -12617,29 +12617,20 @@ Namespaces are one honking great idea -- let's do more of those!</code></pre>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 
-<pre><code>         6454139 function calls in 3.258 seconds
+<pre><code>
 
-   Ordered by: cumulative time
+6454139 function calls in 3.258 seconds
 
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000    3.258    3.258 {built-in method exec}
-        1    0.000    0.000    3.258    3.258 &lt;string&gt;:1(&lt;module&gt;)
-        1    0.000    0.000    3.258    3.258 &lt;ipython-input-161-f2e553eb5c4a&gt;:1(benchmark)
-        1    0.000    0.000    3.257    3.257 &lt;ipython-input-152-cbd75adf7156&gt;:1(huffman_prepare)
-        1    1.457    1.457    3.256    3.256 &lt;ipython-input-158-6446351385fc&gt;:4(count_freqs)
-  3226758    1.119    0.000    1.799    0.000 &lt;ipython-input-158-6446351385fc&gt;:8(&lt;lambda&gt;)
-  3226758    0.680    0.000    0.680    0.000 {method 'read' of '_io.BufferedReader' objects}
-        1    0.000    0.000    0.001    0.001 &lt;ipython-input-160-4e0db1ec3d41&gt;:4(build_tree)
-       87    0.001    0.000    0.001    0.000 {method 'sort' of 'list' objects}
-        1    0.000    0.000    0.000    0.000 {built-in method open}
-        1    0.000    0.000    0.000    0.000 &lt;ipython-input-160-4e0db1ec3d41&gt;:5(&lt;listcomp&gt;)
-      175    0.000    0.000    0.000    0.000 &lt;ipython-input-156-3c06592c3b28&gt;:6(__init__)
-      175    0.000    0.000    0.000    0.000 {method 'pop' of 'list' objects}
-       88    0.000    0.000    0.000    0.000 {built-in method len}
-       87    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
-        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
-        1    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
-        1    0.000    0.000    0.000    0.000 {built-in method iter}</code></pre>
+ ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      1    0.000    0.000    3.258    3.258 benchmark
+      1    0.000    0.000    3.257    3.257 huffman_prepare
+      1    1.457    1.457    3.256    3.256 count_freqs
+3226758    1.119    0.000    1.799    0.000 &lt;lambda&gt;
+3226758    0.680    0.000    0.680    0.000 {method 'read' of '_io.BufferedReader' objects}
+      1    0.000    0.000    0.001    0.001 &lt;ipython-input-160-4e0db1ec3d41&gt;:4(build_tree)
+     87    0.001    0.000    0.001    0.000 {method 'sort' of 'list' objects}
+
+</code></pre>
 
 </div>
 </div>
@@ -12792,27 +12783,16 @@ Namespaces are one honking great idea -- let's do more of those!</code></pre>
 <pre><code>
    725 function calls in 0.684 seconds
 
-   Ordered by: cumulative time
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     1    0.680    0.680    0.682    0.682 count_freqs
+    51    0.000    0.000    0.002    0.000 &lt;lambda&gt;
+    51    0.002    0.000    0.002    0.000 {method 'read' of '_io.BufferedReader' objects}
+     1    0.000    0.000    0.001    0.001 build_tree
+    87    0.001    0.000    0.001    0.000 {method 'sort' of 'list' objects}
+     1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+     1    0.000    0.000    0.000    0.000 {built-in method iter}
 
-   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        1    0.000    0.000    0.684    0.684 {built-in method exec}
-        1    0.000    0.000    0.684    0.684 &lt;string&gt;:1(&lt;module&gt;)
-        1    0.000    0.000    0.684    0.684 &lt;ipython-input-171-b0af3d590602&gt;:3(benchmark)
-        1    0.000    0.000    0.683    0.683 &lt;ipython-input-152-cbd75adf7156&gt;:1(huffman_prepare)
-        1    0.680    0.680    0.682    0.682 &lt;ipython-input-170-338f1fb98e4b&gt;:3(count_freqs)
-       51    0.000    0.000    0.002    0.000 &lt;ipython-input-170-338f1fb98e4b&gt;:8(&lt;lambda&gt;)
-       51    0.002    0.000    0.002    0.000 {method 'read' of '_io.BufferedReader' objects}
-        1    0.000    0.000    0.001    0.001 &lt;ipython-input-160-4e0db1ec3d41&gt;:4(build_tree)
-       87    0.001    0.000    0.001    0.000 {method 'sort' of 'list' objects}
-        1    0.000    0.000    0.000    0.000 &lt;ipython-input-160-4e0db1ec3d41&gt;:5(&lt;listcomp&gt;)
-      175    0.000    0.000    0.000    0.000 &lt;ipython-input-156-3c06592c3b28&gt;:6(__init__)
-        1    0.000    0.000    0.000    0.000 {built-in method open}
-      175    0.000    0.000    0.000    0.000 {method 'pop' of 'list' objects}
-       88    0.000    0.000    0.000    0.000 {built-in method len}
-       87    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
-        1    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
-        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
-        1    0.000    0.000    0.000    0.000 {built-in method iter}</code></pre>
+</code></pre>
 
 </div>
 </div>
@@ -12978,7 +12958,7 @@ Namespaces are one honking great idea -- let's do more of those!</code></pre>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Statistical-profiling-(summary)">Statistical profiling (summary)<a class="anchor-link" href="#Statistical-profiling-(summary)">&#182;</a></h2><h3 id="Pros:">Pros:<a class="anchor-link" href="#Pros:">&#182;</a></h3><ul>
-<li><p>low overhead (depends on profiling period value), thus it's possible to have profiling enabled in production</p>
+<li><p>low overhead, thus it's possible to have profiling enabled in production</p>
 </li>
 <li><p>it's possible to get call stacks from native libraries</p>
 </li>
