@@ -4,6 +4,10 @@ Talks
 2016
 ----
 
+*Python automated testing 101*: [slides][automated_testing_slides]
+[automated_testing_slides]: http://podoliaka.org/talks/autotesting/
+
+
 *CPU profiling of Python applications* at [PyCon UA] 2016: [video][profiling_video_uapycon], [slides][profiling_slides_uapycon]
 [profiling_video_uapycon]: https://www.youtube.com/watch?v=nW3nN7mbdG0
 [profiling_slides_uapycon]: http://podoliaka.org/talks/profiling/
