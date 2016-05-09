@@ -4,7 +4,8 @@ Talks
 2016
 ----
 
-*CPU profiling of Python applications* at [PyCon UA] 2016: [slides][profiling_slides_uapycon]
+*CPU profiling of Python applications* at [PyCon UA] 2016: [video][profiling_video_uapycon], [slides][profiling_slides_uapycon]
+[profiling_video_uapycon]: https://www.youtube.com/watch?v=nW3nN7mbdG0
 [profiling_slides_uapycon]: http://podoliaka.org/talks/profiling/
 
 
