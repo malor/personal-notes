@@ -18,17 +18,17 @@ Why gdb?
 `gdb` is a general purpose debugger, that is mostly used for debugging of C and
 C++ applications (although it actually supports Ada, Objective-C, Pascal and more).
 
-There are multiple reasons why a Python programmer would be interested in `gdb`
+There are different reasons why a Python programmer would be interested in `gdb`
 for debugging:
 
-* `gdb` allows you to attach to a running process without starting an app
+* `gdb` allows one to attach to a running process without starting an app
 in debug mode or modifying the app code in some way first (e.g. putting
 something like `import rpdb; rpdb.set_trace()` into the code)
 
-* `gdb` allows you to take a [core dump] of a process and analyze it later.
+* `gdb` allows one to take a [core dump] of a process and analyze it later.
 This is useful, when you don't want to stop the process for the duration of time,
 while you are introspecting its state, as well as when you do [post-mortem]
-debugging of a process, that has already failed (e.g. [crashed] with a
+debugging of a process that has already failed (e.g. [crashed] with a
 segmentation fault)
 
 * most debuggers available for Python (notable exceptions are [winpdb] and [pydevd])
@@ -48,10 +48,10 @@ Debugging of interpreted languages
 
 So what makes Python special when using `gdb`?
 
-Unlike programming languages like C or C++, Python code is not compiled into a
-native binary for a target platform. Instead there is an interpreter (e.g.
-[CPython], the reference implementation of Python), which executes compiled
-[byte-code].
+In contradistinction to programming languages like C or C++, Python code is not
+compiled into a native binary for a target platform. Instead there is an
+interpreter (e.g.  [CPython], the reference implementation of Python), which
+executes compiled [byte-code].
 
 This effectively means, that when you attach to a Python process with `gdb`,
 you'll debug the interpreter instance and introspect the process state at the
@@ -102,7 +102,7 @@ in your Python code, and all you see is the current state of the interpreter
 itself.
 
 However, [PyEval_EvalFrameEx] looks interesting: it's a function of CPython,
-which executes byte-code of Python application level functions and, thus,
+which executes bytecode of Python application level functions and, thus,
 has access to their state - the very state we are usually interested in.
 
 [CPython]: https://en.wikipedia.org/wiki/CPython
@@ -125,13 +125,12 @@ of course!
 So it's two different, but related things:
 
 * `gdb` versions 7+ are extendable with Python modules
-* there's a Python extension for `gdb` for debugging of CPython processes
+* there's a Python `gdb` extension for debugging of CPython processes
 
 [extend]: https://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python
 [STL]: https://sourceware.org/gdb/wiki/STLSupport
 [macro]: http://www.ibm.com/developerworks/aix/library/au-gdb.html
 [script]: https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py
-
 
 
 Debugging Python with gdb 101
@@ -188,7 +187,7 @@ registers, etc) and map those to application level functions in your code.
 
 Without debugging symbols it's much harder to do - `gdb` allows you to
 manipulate the process memory in any way you want, but you can't easily
-understand what data structures reside in which memory area.
+understand what data structures reside in what memory areas.
 
 After all preparatory steps have been completed, you can give `gdb` a try. E.g.
 in order to attach to a running CPython process, do:
@@ -237,7 +236,7 @@ or find out what exact line of the application code is currently being executed:
 
 ```
 
-or look at local variables and their values:
+or look at values of local variables:
 
 ```
 
@@ -280,7 +279,7 @@ debugging symbols for `python` (which are stripped at the package build time
 to save disk space), but also provide an additional CPython binary
 `python-dbg`.
 
-The latter essentially is a separate build of CPython (with `--with-debug`
+The latter essentially is a separate build of CPython (with `--with-debug` flag
 passed to `./configure`) with many run-time checks.  Generally, you don't want
 to use `python-dbg` in production, as it can be (much) slower than `python`,
 e.g.:
@@ -318,9 +317,9 @@ does not allow `gdb` to get information about local variables at runtime.
 
 Both these options break the described workflow of debugging CPython processes
 by the means of `gdb`. The solution is to rebuild CPython with `-g` or `-g2`
-(2 is the default value when `-g` is passed).
+(`2` is the default value when `-g` is passed).
 
-Fortunately, all current versions of the major Linux distros (Ubuntu Trusty,
+Fortunately, all current versions of the major Linux distros (Ubuntu Trusty/Xenial,
 Debian Jessie, CentOS/RHEL 7) ship the "correctly" built CPython.
 
 [option]: https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
@@ -386,8 +385,7 @@ one provided by your Linux distro).
 
 ## Virtual environments and custom CPython builds
 
-When a virtual environment is used, it may appear that the `gdb` extension does
-not work:
+When a virtual environment is used, it may appear that the extension does not work:
 
 ```
 
@@ -442,11 +440,11 @@ Reading symbols from /home/rpodolyaka/workspace/venvs/default/bin/python2...(no 
 
 ```
 
-How's a virtual environment different? Why did not `gdb` find the debugging symbols?
+How is a virtual environment any different? Why did not `gdb` find the debugging symbols?
 
 First and foremost, the path to `python` executable is different. Note, that I
 did not specify the executable file, when attaching to the process. In this
-case `gdb` will take the executable of the process (i.e. `/proc/$PID/exe`
+case `gdb` will take the executable file of the process (i.e. `/proc/$PID/exe`
 value on Linux).
 
 One of the ways to [separate] debugging symbols is to put those into a well-known
