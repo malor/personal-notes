@@ -4,6 +4,14 @@ Talks
 2016
 ----
 
+*Switching to the new EngineFacade*: [slides][enginefacade_slides]
+[enginefacade_slides]: http://www.slideshare.net/amd4ever/switching-to-the-new-enginefacade
+
+
+*Debugging of CPython processes with gdb*: [slides][gdbdebugging_slides]
+[gdbdebugging_slides]: http://www.slideshare.net/amd4ever/slides-67126020
+
+
 *Python automated testing 101*: [slides][automated_testing_slides]
 [automated_testing_slides]: http://podoliaka.org/talks/autotesting/
 
