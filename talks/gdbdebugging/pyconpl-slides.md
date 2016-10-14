@@ -474,7 +474,7 @@ Controlled by `/proc/sys/kernel/yama/ptrace_scope`, possible values are
 
 ## Gotchas: python-dbg
 
-* a separate build of CPython (with `--with-debug` passed to `./configure`) with many run-time checks enabled, thus, *much* slower
+* a separate build of CPython (with `--with-pydebug` passed to `./configure`) with many run-time checks enabled, thus, *much* slower
 * **not** required for using gdb
 
 ```
