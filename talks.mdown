@@ -23,14 +23,14 @@ Talks
 
 *CPU profiling of Python applications* at [KharkivPy] #12 (Kharkiv, Ukraine): [video][profiling_video], [slides][profiling_slides]
 [profiling_video]: https://www.youtube.com/watch?v=KcvsJ1jvirA
-[profiling_slides]: https://dl.dropboxusercontent.com/u/1543929/kharkivpy-profiling.tar.gz
+[profiling_slides]: https://www.dropbox.com/s/8wdev9or47pdnq7/kharkivpy-profiling.tar.gz?dl=1
 
 2015
 ----
 
 *Debugging of (C)Python applications* at [KharkivPy] #11 (Kharkiv, Ukraine): [video][debugging_video], [slides][debugging_slides]
 [debugging_video]: https://www.youtube.com/watch?v=Yi1VuXjWV2E
-[debugging_slides]: https://dl.dropboxusercontent.com/u/1543929/kharkivpy-debugging.pdf
+[debugging_slides]: https://www.dropbox.com/s/bjowr0j4vck6ijy/kharkivpy-debugging.pdf?dl=1
 
 
 [KharkivPy]: http://kharkivpy.org.ua/

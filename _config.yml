@@ -7,7 +7,7 @@ theme:
   navigation: !!pairs
     - about: /about
     - talks: /talks
-    - CV: https://dl.dropbox.com/u/1543929/cv.pdf
+    - CV: https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1
     - feed: /feed.xml
 
   counters:
