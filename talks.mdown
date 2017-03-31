@@ -1,6 +1,13 @@
 Talks
 =====
 
+2017
+----
+
+*Debugging of CPython processes with gdb* at [KharkivPy] #15: [video][gdbdebugging_video_kharkivpy], [slides][gdbdebugging_slides_kharkivpy]
+[gdbdebugging_video_kharkivpy]: https://www.youtube.com/watch?v=3h4-XTYQhWc
+[gdbdebugging_slides_kharkivpy]: http://www.slideshare.net/amd4ever/debugging-of-cpython-applications-71486119
+
 2016
 ----
 
