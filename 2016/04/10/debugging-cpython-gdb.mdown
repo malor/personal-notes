@@ -279,7 +279,7 @@ debugging symbols for `python` (which are stripped at the package build time
 to save disk space), but also provide an additional CPython binary
 `python-dbg`.
 
-The latter essentially is a separate build of CPython (with `--with-debug` flag
+The latter essentially is a separate build of CPython (with `--with-pydebug` flag
 passed to `./configure`) with many run-time checks.  Generally, you don't want
 to use `python-dbg` in production, as it can be (much) slower than `python`,
 e.g.:
