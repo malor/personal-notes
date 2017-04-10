@@ -1,0 +1,14 @@
+language: python
+python: "3.6"
+
+install: "pip install holocron"
+script: holocron build
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: _build
+  fqdn: podoliaka.org
+  on:
+    branch: master
