@@ -27,7 +27,7 @@ Short bio:
 
 * __Name__: Roman Podoliaka
 * __Nickname__: malor
-* __Age__: 26
+* __Age__: 27
 * __Gender__: Male
 * __Location__: Kharkiv, Ukraine
 
