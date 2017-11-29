@@ -4,6 +4,12 @@ Talks
 2017
 ----
 
+*Machine Learning 101* at [KharkivPy] #17: [video][ml101_video], [slides][ml101_slides], [code][ml101_code]
+[ml101_video]: https://www.youtube.com/watch?v=RtgpPMZu_TY
+[ml101_slides]: http://nbviewer.jupyter.org/format/slides/github/malor/machine-learning-101/blob/master/index.ipynb#/
+[ml101_code]: https://github.com/malor/machine-learning-101
+
+
 *Debugging of CPython processes with gdb* at [KharkivPy] #15: [video][gdbdebugging_video_kharkivpy], [slides][gdbdebugging_slides_kharkivpy]
 [gdbdebugging_video_kharkivpy]: https://www.youtube.com/watch?v=3h4-XTYQhWc
 [gdbdebugging_slides_kharkivpy]: http://www.slideshare.net/amd4ever/debugging-of-cpython-applications-71486119
