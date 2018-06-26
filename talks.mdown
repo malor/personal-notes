@@ -5,7 +5,7 @@ Talks
 ----
 
 *Continuous Integration*: [slides][ci_slides]
-[ci_slides]: http://podoliaka.org/talks/openstackci/
+[ci_slides]: http://podoliaka.org/talks/openstackci/ci.pdf
 
 2017
 ----
