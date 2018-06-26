@@ -1,6 +1,12 @@
 Talks
 =====
 
+2018
+----
+
+*Continuous Integration*: [slides][ci_slides]
+[ci_slides]: http://podoliaka.org/talks/openstackci/
+
 2017
 ----
 
