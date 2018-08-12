@@ -12,10 +12,9 @@ theme:
 
   counters:
     google_analytics: UA-37812430-1
-    yandex_metrika: 20683150
 
   copyright: >
-    &copy; 2017 Roman Podoliaka
+    &copy; 2018 Roman Podoliaka
 
 ext:
   enabled:
