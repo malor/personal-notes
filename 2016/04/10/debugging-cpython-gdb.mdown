@@ -382,6 +382,132 @@ one provided by your Linux distro).
 
 [optimization level]: https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
 
+**Update**: actually, there is something you could do. This "frame information optimized out"
+message essentially tells you that gdb wasn't able to figure out the location of
+``PyFrameObject`` data structure in a given stack frame (DWARF debugging symbols
+allow gdb to calculate addresses of local variables and function arguments). But
+it has to be somewhere; otherwise CPython would not be able to execute your Python
+code.
+
+On x86-64 machines the obvious place to check is CPU registers: there are 16 general
+purpose CPU registers, that compilers can use for storing the values of function
+call arguments and local variables.
+
+The following command prints the values of all CPU registers in the selected
+stack frame:
+
+```
+(gdb) info registers
+rax            0xfffffffffffffdfe	-514
+rbx            0x7ffff7fd7c20	140737353972768
+rcx            0x7ffff7afaff7	140737348874231
+rdx            0x0	0
+rsi            0x0	0
+rdi            0x0	0
+rbp            0x7ffff7fd7d98	0x7ffff7fd7d98
+rsp            0x7fffffffe3c0	0x7fffffffe3c0
+r8             0x7fffffffe050	140737488347216
+r9             0x0	0
+r10            0x0	0
+r11            0x246	582
+r12            0x0	0
+r13            0x7ffff7fae050	140737353801808
+r14            0x7ffff7fae050	140737353801808
+r15            0x0	0
+rip            0x5555556468ca	0x5555556468ca <PyEval_EvalCodeEx+1754>
+eflags         0x246	[ PF ZF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+```
+
+But these are just numbers. We need to help gdb put some meaning behind them.
+
+Note, that some of the numbers above clearly look like memory addresses. We can ask
+gdb to interpret the value of a CPU register as a pointer to some data type. We know,
+that most of CPython runtime data structures are PyObject's, that store information
+on the actual type internally (e.g. ``->ob_type->tp_name`` field contains a type
+name encoded as a C-string).
+
+So what we'll do is try to cast the value of each CPU register to ``PyObject*`` and
+see if we can find anything useful:
+
+```
+(gdb) p ((PyObject*) $rax)->ob_type->tp_name
+Cannot access memory at address 0xfffffffffffffe06
+```
+
+If we give gdb a memory address, that does not actually point to a ``PyObject`` instance,
+we'll get an error on pointer dereference.
+
+There are only so many CPU registers to check.  And you can easily automate this search by the
+means of a helper gdb command similar to:
+
+```python
+class LocatePyFrameObject(gdb.Command):
+    'Locate the CPU register that contains the value of PyFrameObject* in the selected stack frame'
+
+    REGISTERS = (
+        # x86-64 registers, that can be used for storing of local variables and function arguments
+        'rax', 'rbx', 'rcx', 'rdx',
+        'rsi', 'rdi',
+        'rbp', 'rsp',
+        'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15',
+    )
+
+    def __init__(self):
+        super(LocatePyFrameObject, self).__init__(
+            'py-locate-frame',
+            gdb.COMMAND_DATA,
+            gdb.COMPLETE_NONE
+        )
+
+    def invoke(self, args, from_tty):
+        gdb_type = PyObjectPtr.get_gdb_type()
+        frame = gdb.selected_frame()
+
+        for register in self.REGISTERS:
+            try:
+                value = frame.read_register(register).cast(gdb_type)
+                if value['ob_type']['tp_name'].string() == 'frame':
+                    print(register)
+                    return
+            except gdb.MemoryError:
+                # if either cast or pointer dereference fails, then it's not a valid PyFrameObjectPtr*
+                continue
+
+LocatePyFrameObject()
+```
+
+E.g., my CPython build puts the pointer to ``PyFrameObject`` to the CPU register RBX:
+
+```
+(gdb) py-locate-frame
+rbx
+
+(gdb) p ((PyObject*) $rbx)->ob_type->tp_name
+$28 = 0x5555557472ef "frame"
+
+(gdb) p (PyFrameObject*) $rbx
+$29 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in <module> ()
+
+(gdb) p (PyObject*) $rbx
+$30 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in <module> ()
+```
+
+Note, that the loaded ``libpython-gdb.py`` script provides pretty-printing for
+``PyFrameObject`` data structure, as well it's able to figure out a specific
+type of a given ``PyObject`` automatically. So even if high-level commands
+like ``py-bt`` don't work on such stack frames, you'll be able to get the
+very same information by pointing gdb to the location of ``PyFrameObject``
+manually.
+
+Of course, manually poking CPU registers and memory addresses is not pretty,
+but it can be the only way of debugging "optimized out" frames.
+
 
 ## Virtual environments and custom CPython builds
 
