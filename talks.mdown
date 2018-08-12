@@ -4,8 +4,9 @@ Talks
 2018
 ----
 
-*Continuous Integration*: [slides][ci_slides]
+*Continuous Integration*: [slides][ci_slides][ci_video]
 [ci_slides]: http://podoliaka.org/talks/openstackci/ci.pdf
+[ci_video]: https://www.youtube.com/watch?v=25cQ910pyGM
 
 2017
 ----
@@ -27,8 +28,9 @@ Talks
 [enginefacade_slides]: http://www.slideshare.net/amd4ever/switching-to-the-new-enginefacade
 
 
-*Debugging of CPython processes with gdb*: [slides][gdbdebugging_slides]
+*Debugging of CPython processes with gdb* at [PyCon PL] 2016: [slides][gdbdebugging_slides][gdbdebugging_video]
 [gdbdebugging_slides]: http://www.slideshare.net/amd4ever/slides-67126020
+[gdbdebugging_video]: https://www.youtube.com/watch?v=VIhT_XzWnl0
 
 
 *Python automated testing 101*: [slides][automated_testing_slides]
@@ -54,3 +56,4 @@ Talks
 
 [KharkivPy]: http://kharkivpy.org.ua/
 [PyCon UA]: http://ua.pycon.org/
+[PyCon PL]: https://pl.pycon.org/
