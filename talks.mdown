@@ -4,7 +4,7 @@ Talks
 2018
 ----
 
-*Continuous Integration*: [slides][ci_slides][ci_video]
+*Continuous Integration*: [slides][ci_slides], [video][ci_video]
 [ci_slides]: http://podoliaka.org/talks/openstackci/ci.pdf
 [ci_video]: https://www.youtube.com/watch?v=25cQ910pyGM
 
@@ -28,7 +28,7 @@ Talks
 [enginefacade_slides]: http://www.slideshare.net/amd4ever/switching-to-the-new-enginefacade
 
 
-*Debugging of CPython processes with gdb* at [PyCon PL] 2016: [slides][gdbdebugging_slides][gdbdebugging_video]
+*Debugging of CPython processes with gdb* at [PyCon PL] 2016: [slides][gdbdebugging_slides], [video][gdbdebugging_video]
 [gdbdebugging_slides]: http://www.slideshare.net/amd4ever/slides-67126020
 [gdbdebugging_video]: https://www.youtube.com/watch?v=VIhT_XzWnl0
 
