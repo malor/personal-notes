@@ -1,0 +1,426 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>Итераторы для начинающих. Путь С++</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>Итераторы для начинающих. Путь С++</h1>
+
+    <div class="meta">
+    
+written by Roman Podoliaka on
+
+<time datetime="2011-08-20T00:00:00+00:00">
+  August 20, 2011
+</time>
+
+
+
+
+
+    </div>
+  </header>
+
+  <h2>Предисловие</h2>
+<p>Данный пост предназначен исключительно для начинающих и не преследует цели рассказать всё
+об итераторах в <code>С++</code>. Так что если вы знаете о чём-нибудь вроде <code>iterator_traits<></code>,
+вам не будет интересно. Тем не менее, я надеюсь, что эта информация будет полезна для людей,
+которые раньше не сталкивались с итераторами.</p>
+<h2>Практическая задача</h2>
+<p>Предположим перед нами стоит простая задача – написать функцию, которая находила бы в массиве целых
+чисел максимальное значение и возвращала его индекс. Вы могли бы сделать это примерно так:</p>
+<pre class="code cpp literal-block">
+<span class="kt">int</span> <span class="nf">max_element</span><span class="p">(</span><span class="kt">int</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span>
+            <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>Функция работает замечательно, но сразу видно её ограничение – она работает только с целыми
+значениями типа <code>int</code>. Для поиска максимального значения в массива из элементов типа
+<code>float</code> нам нужно написать такую же функцию, только изменив название типа. Мы знаем, что в таком случае,
+лучшие друзья <code>С++</code>-программиста – шаблоны (<cite>templates</cite>).</p>
+<p>Универсальный вариант функции для поиска максимального элемента в массиве переменных произвольного типа выглядит так:</p>
+<pre class="code cpp literal-block">
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">max_element</span><span class="p">(</span><span class="n">T</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span>
+            <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>Казалось бы, чего можно ещё желать. Но что если нам будет необходимо искать максимальный элемент
+не во всём массиве, а в лишь в определённой его части?</p>
+<p>Мы знаем, что массивы в <code>С++</code> представляют собой линейно выделенный участок памяти,
+в котором по порядку расположены элементы. Более того имя массива является указателем на его первый элемент.
+Указатели и массивы неразрывно связаны – для доступа к элементам массива можно использовать адресную арифметику.</p>
+<p>Интервал элементов для нашей функции можно задавать при помощи двух указателей – указателя на <em>первый</em> нужный
+элемент (<code>begin</code>) и указателем на элемент, <em>следующий за последним</em> нужным элементом
+(<code>end</code>). Почему именно полуоткрытый интервал <code>[begin; end)</code>? Потому что это позволит формировать условие выхода
+из цикла очевидным образом.</p>
+<p>Реализация выглядит примерно так:</p>
+<pre class="code cpp literal-block">
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max_element</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">begin</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">end</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
+            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>Используя этот вариант функции можно искать индекс максимального элемента во всём массиве, либо в какой-то его части:</p>
+<pre class="code cpp literal-block">
+<span class="kt">int</span> <span class="n">array</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
+
+<span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span> <span class="o">+</span> <span class="mi">6</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">max_of_first3</span> <span class="o">=</span> <span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span> <span class="o">+</span> <span class="mi">3</span><span class="p">);</span>
+</pre>
+<h2>А можно ли обобщить ещё больше?</h2>
+<p>Это всё хорошо, но, как известно, обычные массивы обладают рядом недостатков: нельзя изменить размер массива,
+нельзя вставить элемент в начало и т. д. Нам бы хотелось иметь возможность использовать другие структуры данных,
+такие как, например, <a class="reference external" href="http://en.wikipedia.org/wiki/Linked_list">связный список</a>.</p>
+<p>Но в связном списке элементы не расположены в памяти по порядку – наша функция поиска индекса максимального
+элемента не может быть использована с этой структурой данных, хотя алгоритм остался прежним – необходимо
+последовательно пройти все элементы и сравнить их с сохранённым максимальным.</p>
+<p>Что действительно изменилось при переходе от массива к связному списку – это доступ к элементам. В массивах
+мы могли использовать стандартную адресную арифметику, тогда как для доступа к следующему элементу связного
+списка необходимо использовать указатель, который хранится в данном узле. <strong>Доступ к элеметнам структуры данных
+жёстко закреплён в нашем алгоритме</strong>, а это значит, что для каждой новой структуры данных придётся реализовывать
+такой же алгоритм с небольшими отличиями в доступе к элементам – и это, конечно же, плохо. Необходимо уменьшить
+степень связи между алгоритмом и структурой данных, используя новую абстракцию.</p>
+<p>Давайте ещё раз взглянем на нашу функцию:</p>
+<pre class="code cpp literal-block">
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max_element</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">begin</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">end</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
+            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>Какие операции для доступа к элементам мы используем?</p>
+<ol class="arabic simple">
+<li><code>*</code> – <cite>разыменование указателя</cite> – получения значения, которое хранится по адресу указателя.</li>
+<li><code>!=</code> – <cite>не равно</cite> – сравнение двух указателей на неравенство (для определения конца интервала).</li>
+<li><code>++</code> – <cite>инкремент</cite> – перемещение указателя на следующий элемент.</li>
+</ol>
+<p>Если бы мы могли передать в функцию <code>max_element()</code> вместо обычного указателя какой-нибудь объект,
+то определив для него данные операции, можно было бы заключить в них логику доступа к элементам связного списка.
+Это не сложно сделать, используя механизмы перегрузки операторов и шаблонов.</p>
+<p>Окончательный вариант функции выглядит так:</p>
+<pre class="code cpp literal-block">
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">Iterator</span><span class="o">&gt;</span>
+<span class="n">Iterator</span> <span class="n">max_element</span><span class="p">(</span><span class="n">Iterator</span> <span class="n">begin</span><span class="p">,</span> <span class="n">Iterator</span> <span class="n">end</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Iterator</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
+            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>Вместо указателя используется новый параметр шаблона - класс <code>Iterator</code>. Так что же такое итератор?</p>
+<p><strong>Итератор</strong> - это специальный объект, который позволяет получить доступ к элементам структуры данных,
+не раскрывая её внутренного устройства, используя определённый абстрактный интерфейс.</p>
+<p>В <code>С++</code> в качестве интерфейса итераторов используется семантика указателей, но могли быть использованы
+обычные методы. Важно то, что данный интерфейс един для всех контейнеров - пользователи работают именно
+с этим интерфейсом и ничего не знают о внутреннем устройтве контейнера, а значит такие алгоритмы как
+поиск максимального элемента могут быть обобщены для массивов, связных списков и т.д.</p>
+<h2>Пример своего итератора</h2>
+<p>Рассмотрим простейшую реализацию связного списка. Реализация узла списка:</p>
+<pre class="code cpp literal-block">
+<span class="cp">#ifndef __LIST_NODE_H__
+#define __LIST_NODE_H__
+</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">Node</span>
+<span class="p">{</span>
+    <span class="n">T</span> <span class="n">data</span><span class="p">;</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">next</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#endif </span><span class="cm">/* __LIST_NODE_H__ */</span>
+</pre>
+<p>Реализация класса списка:</p>
+<pre class="code cpp literal-block">
+<span class="cp">#ifndef __LINKED_LIST_H__
+#define __LINKED_LIST_H__
+</span>
+<span class="cp">#include</span> <span class="cpf">&quot;list_node.h&quot;</span><span class="cp">
+#include</span> <span class="cpf">&quot;list_iterator.h&quot;</span><span class="cp">
+</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">LinkedList</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">LinkedList</span><span class="p">();</span>
+    <span class="o">~</span><span class="n">LinkedList</span><span class="p">();</span>
+
+    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">begin</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">end</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="kt">void</span> <span class="nf">push_front</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">push_back</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">);</span>
+
+<span class="k">private</span><span class="o">:</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_head</span><span class="p">;</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_tail</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">LinkedList</span><span class="p">()</span>
+    <span class="o">:</span> <span class="n">_head</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">_tail</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span> <span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::~</span><span class="n">LinkedList</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">_head</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">next</span> <span class="o">=</span> <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="n">_head</span><span class="p">;</span>
+        <span class="n">_head</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_front</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_head</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
+        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
+        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">_tail</span> <span class="o">=</span> <span class="n">_head</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">oldfirst</span> <span class="o">=</span> <span class="n">_head</span><span class="p">;</span>
+
+        <span class="n">_head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
+        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
+        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">oldfirst</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_back</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_tail</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">_tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
+        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
+        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">_head</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">oldlast</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
+
+        <span class="n">_tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
+        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
+        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">oldlast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">begin</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_head</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">end</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cp">#endif </span><span class="cm">/* __LINKED_LIST_H__ */</span>
+</pre>
+<p>Реализован минимальный набор методов:</p>
+<ul class="simple">
+<li>инициализация структуры данных, освобождение памяти - <code>LinkedList()</code>, <code>~LinkedList()</code></li>
+<li>добавление элементов в начало и в конец списка - <code>push_front()</code>, <code>push_back()</code></li>
+<li>доступ к элементам списка - методы, возвращающие итераторы на начало и конец
+(как вы помните, для итераторов конец - это элемент следующий сразу за последним)
+- <code>begin()</code>, <code>end()</code></li>
+</ul>
+<p>При помощи 2 итераторов можно пройти по всем элементам списка между ними. Реализация итератора для списка:</p>
+<pre class="code cpp literal-block">
+<span class="cp">#ifndef __LIST_ITERATOR_H__
+#define __LIST_ITERATOR_H__
+</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">ListIterator</span>
+<span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">);</span>
+
+    <span class="k">const</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="k">operator</span><span class="o">++</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">it</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+<span class="k">private</span><span class="o">:</span>
+    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_currentNode</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">)</span>
+    <span class="o">:</span> <span class="n">_currentNode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+<span class="p">{</span> <span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">const</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">node</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">_currentNode</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">++</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">_currentNode</span> <span class="o">=</span> <span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">bool</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">it</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">_currentNode</span> <span class="o">!=</span> <span class="n">it</span><span class="p">.</span><span class="n">node</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="cp">#endif </span><span class="cm">/* __LIST_ITERATOR_H__ */</span>
+</pre>
+<p>Итератор инициализируется указателем на узел связного списка. Перегруженные операторы содержат логику перемещения
+между узлами и получения хранимого значения.</p>
+<p>Давайте посмотрим, как можно использовать нашу функцию для поиска максимального элемента как в связном списке
+так и в обычном массиве:</p>
+<pre class="code cpp literal-block">
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">l</span><span class="p">;</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Max in list: &quot;</span>  <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">l</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">l</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Max in array: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr</span> <span class="o">+</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+</pre>
+<h2>Заключение</h2>
+<p>Это, конечно же, лишь малая часть того, что нужно знать об итераторах. Мы рассмотрели лишь один вид итераторов,
+так называемые <strong>Forward Iterators</strong>, которые позволяют получать следующие элементы, двигаясь &quot;прямо&quot;
+(используется оператор <code>++</code>). Существуют и другие виды итераторов, например, <strong>Bidirectional Iterators</strong>,
+которые также позволяют двигаться в обратном направлении (к операторам <code>++</code>, <code>!=</code>, <code>*</code> добавляется оператор <code>--</code>),
+и другие.</p>
+<p>В <code>С++</code> в качестве интерфейса итераторов используется семантика указателей,
+но это просто условность - мог быть выбран любой другой интерфейс.
+Однако такая реализация позволяет использовать обычные указатели в качеcтве итераторов.</p>
+<p>Итераторы играют очень важную роль в <code>STL</code> - они позволяют отделить алгоритмы от структур данных
+- являются прослойкой между ними. Таким образом алгоритмы могут быть обобщены для использования
+над различными структурами данных.</p>
+<p>Исходный код примеров доступен на <a class="reference external" href="https://github.com/malor/iterators-source">GitHub</a>.</p>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2018 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->

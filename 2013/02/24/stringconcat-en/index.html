@@ -1,0 +1,192 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>The story of one subtle optimization</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>The story of one subtle optimization</h1>
+
+    <div class="meta">
+    
+written by Roman Podoliaka on
+
+<time datetime="2013-02-24T00:00:00+00:00">
+  February 24, 2013
+</time>
+
+
+
+
+
+    </div>
+  </header>
+
+  <p>On my previous job I worked on an RPC-like Web-service that was passing JSON-blobs between
+workers via the <a class="reference external" href="http://gearman.org/">Gearman</a> task queue. One day I was hacking on our source
+code trying to find out why it took such a long time (a few seconds) to transfer a 3-megabyte
+JSON-blob. I was sure that it was a problem in our code.  To my surprise the profiler showed that
+the bottleneck was in this function of <a class="reference external" href="https://github.com/Yelp/python-gearman/">python-gearman</a>
+client library:</p>
+<pre class="code python literal-block">
+<span class="k">def</span> <span class="nf">read_data_from_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_to_read</span><span class="o">=</span><span class="mi">4096</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads data from socket --&gt; buffer&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'disconnected'</span><span class="p">)</span>
+
+    <span class="n">recv_buffer</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">recv_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gearman_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bytes_to_read</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket_exception</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">socket_exception</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'remote disconnected'</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span> <span class="o">+=</span> <span class="n">recv_buffer</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span><span class="p">)</span>
+</pre>
+<p>The problem is in the line: <code>self._incoming_buffer += recv_buffer</code> where the <code>_incoming_buffer</code>
+instance variable has the type <code>str</code>. I was always taught that it is a bad idea to do a massive
+string concatenation in a programming language where strings are considered to be immutable. So I
+wrote a small snippet to find out how slow it really was:</p>
+<pre class="code python literal-block">
+<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+    <span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
+</pre>
+<p>The <code>timeit.timeit()</code> function showed that it took less than <strong>1 ms</strong> to call the function <code>f()</code>
+that did 1000 string concatenation operations though. That was really amazing. I started to think
+that I was missing something. So I tried to run the following snippet:</p>
+<pre class="code python literal-block">
+<span class="k">def</span> <span class="nf">g</span><span class="p">():</span>
+    <span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
+</pre>
+<p>It took about 450 ms - that's much &quot;better&quot; (or probably closer to my expectations)!
+So what the heck? These two functions look very similar except that the latter uses an instance
+attribute instead of a simple variable.</p>
+<p>The bytecode comparison of these two function didn't show anything interesting: the for-loop
+is completely the same except that the function <code>g()</code> uses <code>LOAD_ATTR/STORE_ATTR</code> bytecodes
+instead of <code>LOAD_FAST/STORE_FAST</code> ones. But how can attribute access be so slow? It surely
+must not be a bottleneck while concatenating strings in a loop.</p>
+<p>Another interesting thing was that it took the same amount of time (about 1.6 s) to execute both
+<code>f()</code> and <code>g()</code> functions using the <a class="reference external" href="http://pypy.org/">PyPy</a> interpreter.</p>
+<p>Now I was almost sure that <a class="reference external" href="http://python.org/">CPython</a> had some kind of optimization that
+allowed it to execute the <code>f()</code> function so fast. But the second question, why it didn't work
+for the <code>g()</code> function, remained.  Running <code>python</code> with <code>strace</code> showed that execution the
+<code>g()</code> function did almost 100 times more memory allocations than execution of the <code>f()</code>
+function. The time came to debug the interpreter using <code>gdb</code>. The debugging allowed to find
+the <code>CPython</code> function that did string concatenation.</p>
+<p>The source code of <code>string_concatenate()</code> function had a few interesting lines:</p>
+<pre class="code c literal-block">
+ <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">ob_refcnt</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">PyString_CHECK_INTERNED</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
+    <span class="cm">/* Now we own the last reference to 'v', so we can resize it
+     * in-place.
+     */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_PyString_Resize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">new_len</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* XXX if _PyString_Resize() fails, 'v' has been
+         * deallocated so it cannot be put back into
+         * 'variable'.  The MemoryError is raised when there
+         * is no value in 'variable', which might (very
+         * remotely) be a cause of incompatibilities.
+         */</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="cm">/* copy 'w' into the newly allocated area of 'v' */</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">v_len</span><span class="p">,</span>
+           <span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">w_len</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="p">{</span>
+    <span class="cm">/* When in-place resizing is not an option. */</span>
+    <span class="n">PyString_Concat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
+<p>So-so, strings actually <strong>can</strong> be mutable! This allows to resize ones in-place that makes strings
+concatenation very fast. But there is a strict constraint - there must be <strong>at most</strong> 1 reference
+to the string to be resized (otherwise the language contract that strings are immutable would be
+broken).</p>
+<p>It's important to understand that this is only a <code>CPython</code>-specific optimization, and you'd better
+not take benefit of it in your code! Everyone knows that string concatenation in <code>Python</code> is
+a bad idea, so why to change our mind? If you really need to construct a string this way you should
+read the docs for <a class="reference external" href="http://docs.python.org/2/library/stdtypes.html#str.join">str.join()</a>
+method, <a class="reference external" href="http://docs.python.org/2/library/stringio.html">StringIO</a> and
+<a class="reference external" href="http://docs.python.org/2/library/array.html">array</a> modules first - this is the way to write
+code that works efficiently in all <code>Python</code> interpreters.</p>
+<p><strong>P. S.</strong> I wrote a small patch for <a class="reference external" href="https://github.com/Yelp/python-gearman/">python-gearman</a>
+that uses an <code>array</code> type for handling of incoming data that greatly improves the performance.
+The patch was accepted in the <strong>master</strong> branch. Everyone who is interested in using of <code>Gearman</code>
+task queue in <code>Python</code> programs might want to check it out.</p>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2018 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->

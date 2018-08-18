@@ -1,0 +1,679 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>Debugging of CPython processes with gdb</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>Debugging of CPython processes with gdb</h1>
+
+    <div class="meta">
+    
+written by Roman Podoliaka on
+
+<time datetime="2016-04-10T00:00:00+00:00">
+  April 10, 2016
+</time>
+
+
+
+
+
+    </div>
+  </header>
+
+  <p><a href="https://docs.python.org/3.5/library/pdb.html">pdb</a> has been, is and probably always will be the bread and butter of Python
+programmers, when they need to find the root cause of a problem in their
+applications, as it's a built-in and easy to use debugger. But there are cases,
+when <code>pdb</code> can't help you, e.g. if your app has got stuck somewhere, and you
+need to attach to a running process to find out why, without restarting it.
+This is where <a href="https://www.gnu.org/software/gdb/">gdb</a> shines.</p>
+<h2>Why gdb?</h2>
+<p><code>gdb</code> is a general purpose debugger, that is mostly used for debugging of C and
+C++ applications (although it actually supports Ada, Objective-C, Pascal and more).</p>
+<p>There are different reasons why a Python programmer would be interested in <code>gdb</code>
+for debugging:</p>
+<ul>
+<li>
+<p><code>gdb</code> allows one to attach to a running process without starting an app
+in debug mode or modifying the app code in some way first (e.g. putting
+something like <code>import rpdb; rpdb.set_trace()</code> into the code)</p>
+</li>
+<li>
+<p><code>gdb</code> allows one to take a <a href="https://en.wikipedia.org/wiki/Core_dump">core dump</a> of a process and analyze it later.
+This is useful, when you don't want to stop the process for the duration of time,
+while you are introspecting its state, as well as when you do <a href="https://en.wikipedia.org/wiki/Debugging#Techniques">post-mortem</a>
+debugging of a process that has already failed (e.g. <a href="https://www.freedesktop.org/software/systemd/man/systemd-coredump.html">crashed</a> with a
+segmentation fault)</p>
+</li>
+<li>
+<p>most debuggers available for Python (notable exceptions are <a href="http://winpdb.org/">winpdb</a> and <a href="https://github.com/fabioz/PyDev.Debugger">pydevd</a>)
+do not support switching between threads of the application being debugged. <code>gdb</code>
+allows that, as well as debugging of threads created by non-Python code (e.g. in some
+native library used)</p>
+</li>
+</ul>
+<h2>Debugging of interpreted languages</h2>
+<p>So what makes Python special when using <code>gdb</code>?</p>
+<p>In contradistinction to programming languages like C or C++, Python code is not
+compiled into a native binary for a target platform. Instead there is an
+interpreter (e.g.  <a href="https://en.wikipedia.org/wiki/CPython">CPython</a>, the reference implementation of Python), which
+executes compiled <a href="http://security.coverity.com/blog/2014/Nov/understanding-python-bytecode.html">byte-code</a>.</p>
+<p>This effectively means, that when you attach to a Python process with <code>gdb</code>,
+you'll debug the interpreter instance and introspect the process state at the
+interpreter level, not the application level: i.e. you will see functions and
+variables of the interpreter, not of your app.</p>
+<p>To give you an example, let's take a look at a <code>gdb</code> backtrace of a CPython
+(the most popular Python interpreter) process:</p>
+<div class="codehilite"><pre><span></span>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
+#1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
+#2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
+#3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+#4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
+#5  call_function () at ../Python/ceval.c:4041
+#6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+</pre></div>
+
+
+<p>and one obtained by the means of <code>traceback.extract_stack()</code>:</p>
+<div class="codehilite"><pre><span></span>/usr/local/lib/python2.7/dist-packages/eventlet/greenpool.py:82 in _spawn_n_impl
+    `func(*args, **kwargs)`
+
+/opt/stack/neutron/neutron/agent/l3/agent.py:461 in _process_router_update
+    `for rp, update in self._queue.each_update_to_next_router():`
+
+/opt/stack/neutron/neutron/agent/l3/router_processing_queue.py:154 in each_update_to_next_router
+    `next_update = self._queue.get()`
+
+/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:313 in get
+    `return waiter.wait()`
+
+/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:141 in wait
+   `return get_hub().switch()`
+
+/usr/local/lib/python2.7/dist-packages/eventlet/hubs/hub.py:294 in switch
+    `return self.greenlet.switch()`
+</pre></div>
+
+
+<p>As is, the former is of little help, when you are trying to find a problem
+in your Python code, and all you see is the current state of the interpreter
+itself.</p>
+<p>However, <a href="https://docs.python.org/2/c-api/veryhigh.html#c.PyEval_EvalFrameEx">PyEval_EvalFrameEx</a> looks interesting: it's a function of CPython,
+which executes bytecode of Python application level functions and, thus,
+has access to their state - the very state we are usually interested in.</p>
+<h2>gdb and Python</h2>
+<p>Search results for <code>"gdb debug python"</code> can be confusing. The thing is, that starting
+from <code>gdb</code> version 7 it's been possible to <a href="https://sourceware.org/gdb/current/onlinedocs/gdb/Python.html#Python">extend</a> the debugger with Python code, e.g.
+in order to provide visualisations for C++ <a href="https://sourceware.org/gdb/wiki/STLSupport">STL</a> types, which is much easier to implement
+in Python rather than in the built-in <a href="http://www.ibm.com/developerworks/aix/library/au-gdb.html">macro</a> language.</p>
+<p>In order to be able to debug CPython processes and introspect the application level state,
+the interpreter developers decided to extend <code>gdb</code> and wrote a <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">script</a> for that in... Python,
+of course!</p>
+<p>So it's two different, but related things:</p>
+<ul>
+<li><code>gdb</code> versions 7+ are extendable with Python modules</li>
+<li>there's a Python <code>gdb</code> extension for debugging of CPython processes</li>
+</ul>
+<h2>Debugging Python with gdb 101</h2>
+<p>First of all, you need to install <code>gdb</code>:</p>
+<div class="codehilite"><pre><span></span># apt-get install gdb
+</pre></div>
+
+
+<p>or</p>
+<div class="codehilite"><pre><span></span># yum install gdb
+</pre></div>
+
+
+<p>depending on the Linux distro you are using.</p>
+<p>The next step is to install <a href="http://www.tutorialspoint.com/gnu_debugger/gdb_debugging_symbols.htm">debugging symbols</a> for the CPython build you have:</p>
+<div class="codehilite"><pre><span></span># apt-get install python-dbg
+</pre></div>
+
+
+<p>or</p>
+<div class="codehilite"><pre><span></span># yum install python-debuginfo
+</pre></div>
+
+
+<p>Some Linux distros like CentOS or RHEL ship debugging symbols <a href="http://debuginfo.centos.org/">separately</a> from
+all other packages and recommend to install those like:</p>
+<div class="codehilite"><pre><span></span># debuginfo-install python
+</pre></div>
+
+
+<p>The installed debugging symbols will be used by the CPython <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">script</a> for <code>gdb</code>
+in order to analyze the <code>PyEval_EvalFrameEx</code> frames (a frame essentially is a
+function call and the associated state in a form of local variables and CPU
+registers, etc) and map those to application level functions in your code.</p>
+<p>Without debugging symbols it's much harder to do - <code>gdb</code> allows you to
+manipulate the process memory in any way you want, but you can't easily
+understand what data structures reside in what memory areas.</p>
+<p>After all preparatory steps have been completed, you can give <code>gdb</code> a try. E.g.
+in order to attach to a running CPython process, do:</p>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python -p $PID
+</pre></div>
+
+
+<p>At this point you can get an application level backtrace for the current
+thread (note that some frames are "missing" - this is expected, as <code>gdb</code>
+counts all the interpreter level frames and only some of those are calls
+in application level code - <code>PyEval_EvalFrameEx</code> ones):</p>
+<div class="codehilite"><pre><span></span>(gdb) py-bt
+
+#4 Frame 0x1b7da60, for file /usr/lib/python2.7/sched.py, line 111, in run (self=&lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;, q=[...], delayfunc=&lt;built-in function sleep&gt;, timefunc=&lt;built-in function time&gt;, pop=&lt;built-in function heappop&gt;, time=&lt;float at remote 0x1a0a400&gt;, priority=1, action=&lt;function at remote 0x7fe1fa083aa0&gt;, argument=(171657,), checked_event=&lt;...&gt;, now=&lt;float at remote 0x1b8ec58&gt;)
+    delayfunc(time - now)
+#7 Frame 0x1b87e90, for file /usr/bin/dstat, line 2416, in main (interval=1, user=&#39;ubuntu&#39;, hostname=&#39;rpodolyaka-devstack&#39;, key=&#39;unit_hi&#39;, linewidth=150, plugin=&#39;page&#39;, mods=(&#39;page&#39;, &#39;page24&#39;), mod=&#39;page&#39;, pluginfile=&#39;dstat_page&#39;, scheduler=&lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;)
+    scheduler.run()
+#11 Frame 0x7fe1fa0bc5c0, for file /usr/bin/dstat, line 2554, in &lt;module&gt; ()
+    main()
+</pre></div>
+
+
+<p>or find out what exact line of the application code is currently being executed:</p>
+<div class="codehilite"><pre><span></span>(gdb) py-list
+
+ 106            pop = heapq.heappop
+ 107            while q:
+ 108                time, priority, action, argument = checked_event = q[0]
+ 109                now = timefunc()
+ 110                if now &lt; time:
+&gt;111                    delayfunc(time - now)
+ 112                else:
+ 113                    event = pop(q)
+ 114                    # Verify that the event was not removed or altered
+ 115                    # by another thread after we last looked at q[0].
+ 116                    if event is checked_event:
+</pre></div>
+
+
+<p>or look at values of local variables:</p>
+<div class="codehilite"><pre><span></span>(gdb) py-locals
+
+self = &lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;
+q = [&lt;Event at remote 0x7fe1f8c74a10&gt;]
+delayfunc = &lt;built-in function sleep&gt;
+timefunc = &lt;built-in function time&gt;
+pop = &lt;built-in function heappop&gt;
+time = &lt;float at remote 0x1a0a400&gt;
+priority = 1
+action = &lt;function at remote 0x7fe1fa083aa0&gt;
+argument = (171657,)
+checked_event = &lt;Event at remote 0x7fe1f8c74a10&gt;
+now = &lt;float at remote 0x1b8ec58&gt;
+</pre></div>
+
+
+<p>There are more <code>py-</code> commands provided by the CPython <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">script</a> for <code>gdb</code>.
+Check out the debugging <a href="https://docs.python.org/devguide/gdb.html">guide</a> for details.</p>
+<h2>Gotchas</h2>
+<p>Although the described technique should work out-of-box, there are a few known
+gotchas.</p>
+<h2>python-dbg</h2>
+<p>The <code>python-dbg</code> package in Debian and Ubuntu will not only install the
+debugging symbols for <code>python</code> (which are stripped at the package build time
+to save disk space), but also provide an additional CPython binary
+<code>python-dbg</code>.</p>
+<p>The latter essentially is a separate build of CPython (with <code>--with-pydebug</code> flag
+passed to <code>./configure</code>) with many run-time checks.  Generally, you don't want
+to use <code>python-dbg</code> in production, as it can be (much) slower than <code>python</code>,
+e.g.:</p>
+<div class="codehilite"><pre><span></span>$ <span class="nb">time</span> python -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<span class="m">499999500000</span>
+
+real    0m0.096s
+user    0m0.057s
+sys 0m0.030s
+
+$ <span class="nb">time</span> python-dbg -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<span class="m">499999500000</span>
+<span class="o">[</span><span class="m">18318</span> refs<span class="o">]</span>
+
+real    0m0.237s
+user    0m0.197s
+sys 0m0.016s
+</pre></div>
+
+
+<p>The good thing is, that you don't need to: it's still possible to debug
+<code>python</code> executable by the means of <code>gdb</code>, as long as the corresponding debugging
+symbols are installed.  So <code>python-dbg</code> just adds a bit more confusion to the
+CPython/gdb story - you can safely ignore its existence.</p>
+<h2>Build flags</h2>
+<p>Some Linux distros build CPython passing the <code>-g0</code> or <code>-g1</code> <a href="https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html">option</a> to <code>gcc</code>:
+the former produces a binary without debugging information at all, and the latter
+does not allow <code>gdb</code> to get information about local variables at runtime.</p>
+<p>Both these options break the described workflow of debugging CPython processes
+by the means of <code>gdb</code>. The solution is to rebuild CPython with <code>-g</code> or <code>-g2</code>
+(<code>2</code> is the default value when <code>-g</code> is passed).</p>
+<p>Fortunately, all current versions of the major Linux distros (Ubuntu Trusty/Xenial,
+Debian Jessie, CentOS/RHEL 7) ship the "correctly" built CPython.</p>
+<h2>Optimized out frames</h2>
+<p>For introspection to work properly, it's crucial, that information about
+<code>PyEval_EvalFrameEx</code> arguments is preserved for each call. Depending on the
+<a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html">optimization level</a> used in <code>gcc</code> when building CPython or the concrete
+compiler version used, it's possible that this information will be lost at
+runtime (especially with aggressive optimizations enabled by <code>-O3</code>). In this
+case <code>gdb</code> will show you something like:</p>
+<div class="codehilite"><pre><span></span>(gdb) bt
+
+#0  0x00007fdf3ca31be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
+#1  0x00000000005d1da4 in pysleep (secs=&lt;optimized out&gt;) at ../Modules/timemodule.c:1408
+#2  time_sleep () at ../Modules/timemodule.c:231
+#3  0x00000000004f5465 in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b184c0) at ../Python/ceval.c:4637
+#4  PyEval_EvalFrameEx () at ../Python/ceval.c:3185
+#5  0x00000000004f5194 in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7fff62b185c0, 
+    func=&lt;optimized out&gt;) at ../Python/ceval.c:4750
+#6  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b185c0) at ../Python/ceval.c:4677
+#7  PyEval_EvalFrameEx () at ../Python/ceval.c:3185
+#8  0x00000000004f5194 in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7fff62b186c0, 
+    func=&lt;optimized out&gt;) at ../Python/ceval.c:4750
+#9  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b186c0) at ../Python/ceval.c:4677
+#10 PyEval_EvalFrameEx () at ../Python/ceval.c:3185
+#11 0x00000000005c5da8 in _PyEval_EvalCodeWithName.lto_priv.1326 () at ../Python/ceval.c:3965
+#12 0x00000000005e9d7f in PyEval_EvalCodeEx () at ../Python/ceval.c:3986
+#13 PyEval_EvalCode (co=&lt;optimized out&gt;, globals=&lt;optimized out&gt;, locals=&lt;optimized out&gt;) at ../Python/ceval.c:777
+#14 0x00000000005fe3d2 in run_mod () at ../Python/pythonrun.c:970
+#15 0x000000000060057a in PyRun_FileExFlags () at ../Python/pythonrun.c:923
+#16 0x000000000060075c in PyRun_SimpleFileExFlags () at ../Python/pythonrun.c:396
+#17 0x000000000062b870 in run_file (p_cf=0x7fff62b18920, filename=0x1733260 L&quot;test2.py&quot;, fp=0x1790190) at ../Modules/main.c:318
+#18 Py_Main () at ../Modules/main.c:768
+#19 0x00000000004cb8ef in main () at ../Programs/python.c:69
+#20 0x00007fdf3c970610 in __libc_start_main (main=0x4cb810 &lt;main&gt;, argc=2, argv=0x7fff62b18b38, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
+    rtld_fini=&lt;optimized out&gt;, stack_end=0x7fff62b18b28) at libc-start.c:291
+#21 0x00000000005c9df9 in _start ()
+
+(gdb) py-bt
+Traceback (most recent call first):
+  File &quot;test2.py&quot;, line 9, in g
+    time.sleep(1000)
+  File &quot;test2.py&quot;, line 5, in f
+    g()
+  (frame information optimized out)
+</pre></div>
+
+
+<p>i.e. some application level frames will be available, some will not.
+There is little you can do at this point, except for rebuilding CPython
+with a lower optimization level, but that often is not an option for production
+(not to mention the fact you'll be using a custom CPython build, not the
+one provided by your Linux distro).</p>
+<p><strong>Update</strong>: actually, there is something you could do. This "frame information optimized out"
+message essentially tells you that gdb wasn't able to figure out the location of
+<code>PyFrameObject</code> data structure in a given stack frame (DWARF debugging symbols
+allow gdb to calculate addresses of local variables and function arguments). But
+it has to be somewhere; otherwise CPython would not be able to execute your Python
+code.</p>
+<p>On x86-64 machines the obvious place to check is CPU registers: there are 16 general
+purpose CPU registers, that compilers can use for storing the values of function
+call arguments and local variables.</p>
+<p>The following command prints the values of all CPU registers in the selected
+stack frame:</p>
+<div class="codehilite"><pre><span></span>(gdb) info registers
+rax            0xfffffffffffffdfe   -514
+rbx            0x7ffff7fd7c20   140737353972768
+rcx            0x7ffff7afaff7   140737348874231
+rdx            0x0  0
+rsi            0x0  0
+rdi            0x0  0
+rbp            0x7ffff7fd7d98   0x7ffff7fd7d98
+rsp            0x7fffffffe3c0   0x7fffffffe3c0
+r8             0x7fffffffe050   140737488347216
+r9             0x0  0
+r10            0x0  0
+r11            0x246    582
+r12            0x0  0
+r13            0x7ffff7fae050   140737353801808
+r14            0x7ffff7fae050   140737353801808
+r15            0x0  0
+rip            0x5555556468ca   0x5555556468ca &lt;PyEval_EvalCodeEx+1754&gt;
+eflags         0x246    [ PF ZF IF ]
+cs             0x33 51
+ss             0x2b 43
+ds             0x0  0
+es             0x0  0
+fs             0x0  0
+gs             0x0  0
+</pre></div>
+
+
+<p>But these are just numbers. We need to help gdb put some meaning behind them.</p>
+<p>Note, that some of the numbers above clearly look like memory addresses. We can ask
+gdb to interpret the value of a CPU register as a pointer to some data type. We know,
+that most of CPython runtime data structures are PyObject's, that store information
+on the actual type internally (e.g. <code>-&gt;ob_type-&gt;tp_name</code> field contains a type
+name encoded as a C-string).</p>
+<p>So what we'll do is try to cast the value of each CPU register to <code>PyObject*</code> and
+see if we can find anything useful:</p>
+<div class="codehilite"><pre><span></span>(gdb) p ((PyObject*) $rax)-&gt;ob_type-&gt;tp_name
+Cannot access memory at address 0xfffffffffffffe06
+</pre></div>
+
+
+<p>If we give gdb a memory address, that does not actually point to a <code>PyObject</code> instance,
+we'll get an error on pointer dereference.</p>
+<p>There are only so many CPU registers to check.  And you can easily automate this search by the
+means of a helper gdb command similar to:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">LocatePyFrameObject</span><span class="p">(</span><span class="n">gdb</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+    <span class="s1">&#39;Locate the CPU register that contains the value of PyFrameObject* in the selected stack frame&#39;</span>
+
+    <span class="n">REGISTERS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="c1"># x86-64 registers, that can be used for storing of local variables and function arguments</span>
+        <span class="s1">&#39;rax&#39;</span><span class="p">,</span> <span class="s1">&#39;rbx&#39;</span><span class="p">,</span> <span class="s1">&#39;rcx&#39;</span><span class="p">,</span> <span class="s1">&#39;rdx&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rsi&#39;</span><span class="p">,</span> <span class="s1">&#39;rdi&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rbp&#39;</span><span class="p">,</span> <span class="s1">&#39;rsp&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;r8&#39;</span><span class="p">,</span> <span class="s1">&#39;r9&#39;</span><span class="p">,</span> <span class="s1">&#39;r10&#39;</span><span class="p">,</span> <span class="s1">&#39;r11&#39;</span><span class="p">,</span> <span class="s1">&#39;r12&#39;</span><span class="p">,</span> <span class="s1">&#39;r13&#39;</span><span class="p">,</span> <span class="s1">&#39;r14&#39;</span><span class="p">,</span> <span class="s1">&#39;r15&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LocatePyFrameObject</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="s1">&#39;py-locate-frame&#39;</span><span class="p">,</span>
+            <span class="n">gdb</span><span class="o">.</span><span class="n">COMMAND_DATA</span><span class="p">,</span>
+            <span class="n">gdb</span><span class="o">.</span><span class="n">COMPLETE_NONE</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">invoke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">from_tty</span><span class="p">):</span>
+        <span class="n">gdb_type</span> <span class="o">=</span> <span class="n">PyObjectPtr</span><span class="o">.</span><span class="n">get_gdb_type</span><span class="p">()</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">gdb</span><span class="o">.</span><span class="n">selected_frame</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REGISTERS</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">read_register</span><span class="p">(</span><span class="n">register</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">gdb_type</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;ob_type&#39;</span><span class="p">][</span><span class="s1">&#39;tp_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;frame&#39;</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">register</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="n">gdb</span><span class="o">.</span><span class="n">MemoryError</span><span class="p">:</span>
+                <span class="c1"># if either cast or pointer dereference fails, then it&#39;s not a valid PyFrameObjectPtr*</span>
+                <span class="k">continue</span>
+
+<span class="n">LocatePyFrameObject</span><span class="p">()</span>
+</pre></div>
+
+
+<p>E.g., my CPython build puts the pointer to <code>PyFrameObject</code> to the CPU register RBX:</p>
+<div class="codehilite"><pre><span></span>(gdb) py-locate-frame
+rbx
+
+(gdb) p ((PyObject*) $rbx)-&gt;ob_type-&gt;tp_name
+$28 = 0x5555557472ef &quot;frame&quot;
+
+(gdb) p (PyFrameObject*) $rbx
+$29 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in &lt;module&gt; ()
+
+(gdb) p (PyObject*) $rbx
+$30 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in &lt;module&gt; ()
+</pre></div>
+
+
+<p>Note, that the loaded <code>libpython-gdb.py</code> script provides pretty-printing for
+<code>PyFrameObject</code> data structure, as well it's able to figure out a specific
+type of a given <code>PyObject</code> automatically. So even if high-level commands
+like <code>py-bt</code> don't work on such stack frames, you'll be able to get the
+very same information by pointing gdb to the location of <code>PyFrameObject</code>
+manually.</p>
+<p>Of course, manually poking CPU registers and memory addresses is not pretty,
+but it can be the only way of debugging "optimized out" frames.</p>
+<h2>Virtual environments and custom CPython builds</h2>
+<p>When a virtual environment is used, it may appear that the extension does not work:</p>
+<div class="codehilite"><pre><span></span>(gdb) bt
+
+#0  0x00007ff2df3d0be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
+#1  0x0000000000588c4a in ?? ()
+#2  0x00000000004bad9a in PyEval_EvalFrameEx ()
+#3  0x00000000004bfd1f in PyEval_EvalFrameEx ()
+#4  0x00000000004bfd1f in PyEval_EvalFrameEx ()
+#5  0x00000000004b8556 in PyEval_EvalCodeEx ()
+#6  0x00000000004e91ef in ?? ()
+#7  0x00000000004e3d92 in PyRun_FileExFlags ()
+#8  0x00000000004e2646 in PyRun_SimpleFileExFlags ()
+#9  0x0000000000491c23 in Py_Main ()
+#10 0x00007ff2df30f610 in __libc_start_main (main=0x491670 &lt;main&gt;, argc=2, argv=0x7ffc36f11cf8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
+    rtld_fini=&lt;optimized out&gt;, stack_end=0x7ffc36f11ce8) at libc-start.c:291
+#11 0x000000000049159b in _start ()
+
+(gdb) py-bt
+
+Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
+</pre></div>
+
+
+<p><code>gdb</code> can still follow the CPython frames, but information on <code>PyEval_EvalCodeEx</code>
+calls is not available.</p>
+<p>If you scroll up the <code>gdb</code> output a bit, you'll see that <code>gdb</code> failed to find
+the debugging symbols for <code>python</code> executable:</p>
+<div class="codehilite"><pre><span></span>$ gdb -p <span class="m">2975</span>
+
+GNU gdb <span class="o">(</span>Debian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
+Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2015</span> Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;show copying&quot;</span>
+and <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> details.
+This GDB was configured as <span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
+Type <span class="s2">&quot;show configuration&quot;</span> <span class="k">for</span> configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+&lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+For help, <span class="nb">type</span> <span class="s2">&quot;help&quot;</span>.
+Type <span class="s2">&quot;apropos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;word&quot;</span>.
+Attaching to process <span class="m">2975</span>
+Reading symbols from /home/rpodolyaka/workspace/venvs/default/bin/python2...<span class="o">(</span>no debugging symbols found<span class="o">)</span>...done.
+</pre></div>
+
+
+<p>How is a virtual environment any different? Why did not <code>gdb</code> find the debugging symbols?</p>
+<p>First and foremost, the path to <code>python</code> executable is different. Note, that I
+did not specify the executable file, when attaching to the process. In this
+case <code>gdb</code> will take the executable file of the process (i.e. <code>/proc/$PID/exe</code>
+value on Linux).</p>
+<p>One of the ways to <a href="https://sourceware.org/gdb/onlinedocs/gdb/Separate-Debug-Files.html">separate</a> debugging symbols is to put those into a well-known
+directory (default is <code>/usr/lib/debug/</code>, although it's configurable via
+<code>debug-file-directory</code> option in <code>gdb</code>). In our case <code>gdb</code> tried to load
+debugging symbols from <code>/usr/lib/debug/home/rpodolyaka/workspace/venvs/default/bin/python2</code> and,
+obviously, did not find anything there.</p>
+<p>The solution is simple - specify the executable under debug explicitly when
+running <code>gdb</code>:</p>
+<div class="codehilite"><pre><span></span>$ gdb /usr/bin/python2.7 -p <span class="nv">$PID</span>
+</pre></div>
+
+
+<p>Thus, <code>gdb</code> will look for debugging symbols in the "right" place -
+<code>/usr/lib/debug/usr/bin/python2.7</code>.</p>
+<p>It's also worth mentioning, that it's possible that debugging symbols for a
+particular executable are identified by a unique <code>build-id</code> value stored
+in <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> executable headers. E.g. CPython on my Debian machine:</p>
+<div class="codehilite"><pre><span></span>$ objdump -s -j .note.gnu.build-id /usr/bin/python2.7
+
+/usr/bin/python2.7:     file format elf64-x86-64
+
+Contents of section .note.gnu.build-id:
+ <span class="m">400274</span> <span class="m">04000000</span> <span class="m">14000000</span> <span class="m">03000000</span> 474e5500  ............GNU.
+ <span class="m">400284</span> 8d04a3ae 38521cb7 c7928e4a 7c8b1ed3  ....8R.....J<span class="p">|</span>...
+ <span class="m">400294</span> 85e763e4
+</pre></div>
+
+
+<p>In this case <code>gdb</code> will look for debugging symbols using the <code>build-id</code> value:</p>
+<div class="codehilite"><pre><span></span>$ gdb /usr/bin/python2.7
+
+GNU gdb <span class="o">(</span>Debian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
+Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2015</span> Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;show copying&quot;</span>
+and <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> details.
+This GDB was configured as <span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
+Type <span class="s2">&quot;show configuration&quot;</span> <span class="k">for</span> configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+&lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+For help, <span class="nb">type</span> <span class="s2">&quot;help&quot;</span>.
+Type <span class="s2">&quot;apropos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;word&quot;</span>...
+Reading symbols from /usr/bin/python2.7...Reading symbols from /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
+<span class="k">done</span>.
+</pre></div>
+
+
+<p>This has a nice implication - it no longer matters how the executable is called:
+<code>virtualenv</code> just creates a copy of the specified interpreter executable, thus,
+both executables - the one in <code>/usr/bin/</code> and the one in your virtual environment
+will use the very same debugging symbols:</p>
+<div class="codehilite"><pre><span></span>$ gdb -p <span class="m">11150</span>
+
+GNU gdb <span class="o">(</span>ebian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
+Copyright <span class="o">()</span> <span class="m">2015</span> Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;how copying&quot;</span>
+and <span class="s2">&quot;how warranty&quot;</span> <span class="k">for</span> details.
+This GDB was configured as <span class="s2">&quot;86_64-linux-gnu&quot;</span>.
+Type <span class="s2">&quot;how configuration&quot;</span> <span class="k">for</span> configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+&lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+For help, <span class="nb">type</span> <span class="s2">&quot;elp&quot;</span>.
+Type <span class="s2">&quot;propos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;ord&quot;</span>.
+Attaching to process <span class="m">11150</span>
+Reading symbols from /home/rpodolyaka/sandbox/testvenv/bin/python2.7...Reading symbols from
+/usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
+
+$ ls -la /proc/11150/exe
+lrwxrwxrwx <span class="m">1</span> rpodolyaka rpodolyaka <span class="m">0</span> Apr <span class="m">10</span> <span class="m">15</span>:18 /proc/11150/exe -&gt; /home/rpodolyaka/sandbox/testvenv/bin/python2.7
+</pre></div>
+
+
+<p>The first problem is solved, <code>bt</code> output now looks much nicer, but <code>py-bt</code> command is still
+undefined:</p>
+<div class="codehilite"><pre><span></span>(gdb) bt
+
+#0  0x00007f3e95083be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
+#1  0x0000000000594a59 in floatsleep (secs=&lt;optimized out&gt;) at ../Modules/timemodule.c:948
+#2  time_sleep.lto_priv () at ../Modules/timemodule.c:206
+#3  0x00000000004c524a in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb5045b0) at ../Python/ceval.c:4350
+#4  PyEval_EvalFrameEx () at ../Python/ceval.c:2987
+#5  0x00000000004ca95f in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7ffefb504700, 
+    func=0x7f3e95f78c80) at ../Python/ceval.c:4435
+#6  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb504700) at ../Python/ceval.c:4370
+#7  PyEval_EvalFrameEx () at ../Python/ceval.c:2987
+#8  0x00000000004ca95f in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7ffefb504850, 
+    func=0x7f3e95f78c08) at ../Python/ceval.c:4435
+#9  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb504850) at ../Python/ceval.c:4370
+#10 PyEval_EvalFrameEx () at ../Python/ceval.c:2987
+#11 0x00000000004c32e5 in PyEval_EvalCodeEx () at ../Python/ceval.c:3582
+#12 0x00000000004c3089 in PyEval_EvalCode (co=&lt;optimized out&gt;, globals=&lt;optimized out&gt;, locals=&lt;optimized out&gt;) at ../Python/ceval.c:669
+#13 0x00000000004f263f in run_mod.lto_priv () at ../Python/pythonrun.c:1376
+#14 0x00000000004ecf52 in PyRun_FileExFlags () at ../Python/pythonrun.c:1362
+#15 0x00000000004eb6d1 in PyRun_SimpleFileExFlags () at ../Python/pythonrun.c:948
+#16 0x000000000049e2d8 in Py_Main () at ../Modules/main.c:640
+#17 0x00007f3e94fc2610 in __libc_start_main (main=0x49dc00 &lt;main&gt;, argc=2, argv=0x7ffefb504c98, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
+    rtld_fini=&lt;optimized out&gt;, stack_end=0x7ffefb504c88) at libc-start.c:291
+#18 0x000000000049db29 in _start ()
+
+(gdb) py-bt
+
+Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
+</pre></div>
+
+
+<p>Once again, this is caused by the fact that <code>python</code> binary in a virtual
+environment has a different path. By default, <code>gdb</code> will try to <a href="https://sourceware.org/gdb/onlinedocs/gdb/Python-Auto_002dloading.html#set%20auto%2dload%20python%2dscripts">auto-load</a>
+Python extensions for a particular object file under debug, if they exist.
+Specifically, <code>gdb</code> will look for <code>objfile-gdb.py</code> and try to <code>source</code> it on
+start:</p>
+<div class="codehilite"><pre><span></span>(gdb) info auto-load
+
+gdb-scripts:  No auto-load scripts.
+libthread-db:  No auto-loaded libthread-db.
+local-gdbinit:  Local .gdbinit file was not found.
+python-scripts:
+Loaded  Script
+Yes     /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
+</pre></div>
+
+
+<p>If, for some reason this has not been done, you can always do it manually:</p>
+<div class="codehilite"><pre><span></span>(gdb) source /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
+</pre></div>
+
+
+<p>e.g. if you want to test a new version of the <code>gdb</code> extension shipped with CPython.</p>
+<h2>PyPy, Jython, etc</h2>
+<p>The described debugging technique is only feasible for the CPython interpreter
+as is, as the <code>gdb</code> extension is specifically written to introspect the state
+of CPython internals (e.g. <code>PyEval_EvalFrameEx</code> calls).</p>
+<p>For <a href="http://pypy.org/">PyPy</a> there is an open <a href="https://bitbucket.org/pypy/pypy/issues/1204/gdb-hooks-for-debugging-pypy">issue</a> on Bitbucket, where it was proposed to
+provide integration with <code>gdb</code>, but looks like the attached patches have not
+been merged yet and the person, who wrote those, lost interest in this.</p>
+<p>For <a href="http://www.jython.org/">Jython</a> you could probably use standard tools for debugging of <code>JVM</code>
+applications, e.g. <a href="http://visualvm.java.net/">VisualVM</a>.</p>
+<h2>Conclusion</h2>
+<p><code>gdb</code> is a powerful tool, that allows one to debug complex problems with
+crashing or hanging CPython processes, as well as Python code, that does
+calls to native libraries. On modern Linux distros debugging CPython processes
+with <code>gdb</code> must be as simple as installing of debugging symbols for the
+concrete interpreter build, although there are a few known gotchas, especially
+when virtual environments are used.</p>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2018 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->

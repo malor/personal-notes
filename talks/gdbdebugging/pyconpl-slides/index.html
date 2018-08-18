@@ -1,0 +1,610 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>Debugging of CPython processes with gdb</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>Debugging of CPython processes with gdb</h1>
+
+    <div class="meta">
+    
+    
+    </div>
+  </header>
+
+  <p>PyCon PL
+October 15th, 2016
+Ossa, Poland</p>
+<p>by Roman Podoliaka, Development Manager at <a href="http://mirantis.com/">Mirantis</a></p>
+<p>twitter: @rpodoliaka
+email: roman.podoliaka@gmail.com
+blog: http://podoliaka.org
+slides: http://podoliaka.org/talks/</p>
+<hr />
+<h1>Goals of this talk</h1>
+<ul>
+<li>
+<p>make gdb <strong>"a known unknown"</strong>, so that you consider it as an option in the future</p>
+</li>
+<li>
+<p>highlight the common gotchas</p>
+</li>
+</ul>
+<hr />
+<h1>Why debugging?</h1>
+<ul>
+<li>
+<p>working on a huge open source cloud platform - <a href="https://www.openstack.org/">OpenStack</a></p>
+</li>
+<li>
+<p>dozens of various (micro-)services - from REST APIs to system daemons</p>
+</li>
+<li>
+<p>new features are important, but high availability and overall stability are even more important</p>
+</li>
+<li>
+<p>continuous functional / performance / scale testing</p>
+</li>
+<li>
+<p>numerous customer deployments</p>
+</li>
+<li>
+<p>things break... pretty much all the time!</p>
+</li>
+</ul>
+<hr />
+<h1>Caveats</h1>
+<p>The described debugging techniques assume that you use:</p>
+<ul>
+<li>
+<p>Linux</p>
+<ul>
+<li>Darwin (macOS) must be similar, but <strong>lldb</strong> is the debugger of choice there</li>
+<li>Windows <strong>should</strong> work if you use a recent gdb build with Python support enabled and have debugging symbols for CPython</li>
+</ul>
+</li>
+<li>
+<p>CPython 2.7+, 3.x</p>
+<ul>
+<li>debugging scripts are interpreter-specific, so no PyPy/Jython/etc</li>
+<li>2.6 works too, but up-to-date scripts are more useful</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h1>What's wrong with pdb?</h1>
+<p>It's a nice and easy to use debugger, that should be your default choice, but it:</p>
+<ul>
+<li>
+<p>can't attach to a running process</p>
+</li>
+<li>
+<p>can't step into native code</p>
+</li>
+<li>
+<p>can't be used for debugging of interpreter crashes (i.e. core dumps)</p>
+</li>
+</ul>
+<hr />
+<h2>Typical problems: hung process</h2>
+<ul>
+<li>
+<p>a process is stuck in <code>S (sleeping)</code> state and does not respond</p>
+</li>
+<li>
+<p><code>strace</code>'ing shows that it is trying to acquire a lock (i.e. <code>futex(...)</code>)</p>
+</li>
+<li>
+<p>one needs a way to map this to the exact line in the application code</p>
+</li>
+<li>
+<p>especially important if you use cooperative concurrency (i.e. asyncio, eventlet, gevent, etc)</p>
+</li>
+</ul>
+<hr />
+<h2>Typical problems: going into native code</h2>
+<ul>
+<li>
+<p>~14000 unit tests, one or a few create a temporary directory in the git working tree and do not clean up after themselves. How do you identify those?</p>
+</li>
+<li>
+<p>pdb does not allow to set breakpoints in <strong>built-in</strong> functions (like <code>os.makedirs()</code>)</p>
+</li>
+</ul>
+<hr />
+<h2>Typical problems: interpreter crashes</h2>
+<ul>
+<li>
+<p>rarely happen in common applications</p>
+</li>
+<li>
+<p>but still do with things like <a href="https://github.com/GrahamDumpleton/mod_wsgi/issues/81">mod_wsgi</a></p>
+</li>
+<li>
+<p>or calls to native libraries via <a href="https://bitbucket.org/cffi/cffi/issues/240/cffi-crash-on-debian-unstable-with-gcc-5">cffi</a></p>
+</li>
+</ul>
+<hr />
+<h1>gdb</h1>
+<ul>
+<li>
+<p>a general purpose debugger, that is mostly used for debugging of C and C++ applications (supports Objective-C, Pascal, Rust and more)</p>
+</li>
+<li>
+<p>allows attaching to a running process without instrumenting it in advance</p>
+</li>
+<li>
+<p>allows taking a <strong>core dump</strong> (a state of process memory at a specific moment of time) to analyze it later</p>
+</li>
+<li>
+<p>allows <em>post-mortem</em> debugging of core dumps saved by the kernel on process crash (if <code>ulimit</code> allows for it)</p>
+</li>
+<li>
+<p>allows switching between threads</p>
+</li>
+</ul>
+<hr />
+<h2>ptrace: the secret power behind gdb and strace</h2>
+<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;sys/ptrace.h&gt;</span><span class="cp"></span>
+
+<span class="kt">long</span> <span class="nf">ptrace</span><span class="p">(</span><span class="k">enum</span> <span class="n">__ptrace_request</span> <span class="n">request</span><span class="p">,</span> <span class="kt">pid_t</span> <span class="n">pid</span><span class="p">,</span>
+            <span class="kt">void</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">);</span>
+</pre></div>
+
+
+<p>provides a means by which one process (the "tracer") may observe and control the execution of another process (the "tracee")</p>
+<hr />
+<h2>Debugging of interpreted languages</h2>
+<ul>
+<li>
+<p>Python code is not compiled into a native binary for a target platform. Instead there is an interpreter (e.g. CPython, the reference implementation of Python), which executes compiled byte-code</p>
+</li>
+<li>
+<p>when you attach to a Python process with gdb, you'll debug the interpreter instance and introspect the process state at the interpreter level, not the application level</p>
+</li>
+</ul>
+<hr />
+<h2>Debugging of interpreted languages: interpreter level traceback</h2>
+<div class="codehilite"><pre><span></span>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
+#1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
+#2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
+#3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+#4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
+#5  call_function () at ../Python/ceval.c:4041
+#6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+</pre></div>
+
+
+<hr />
+<h2>Debugging of interpreted languages: application level traceback</h2>
+<div class="codehilite"><pre><span></span>/usr/local/lib/python2.7/dist-packages/eventlet/greenpool.py:82 in _spawn_n_impl
+    `func(*args, **kwargs)`
+/opt/stack/neutron/neutron/agent/l3/agent.py:461 in _process_router_update
+    `for rp, update in self._queue.each_update_to_next_router():`
+/opt/stack/neutron/neutron/agent/l3/router_processing_queue.py:154 in each_update_to_next_router
+    `next_update = self._queue.get()`
+/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:313 in get
+    `return waiter.wait()`
+/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:141 in wait
+   `return get_hub().switch()`
+/usr/local/lib/python2.7/dist-packages/eventlet/hubs/hub.py:294 in switch
+    `return self.greenlet.switch()`
+</pre></div>
+
+
+<hr />
+<h2>PyEval_EvalFrameEx</h2>
+<div class="codehilite"><pre><span></span><span class="n">PyEval_EvalFrameEx</span><span class="p">(</span><span class="n">PyFrameObject</span> <span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="kt">int</span> <span class="n">throwflag</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="cm">/* variable declaration and initialization stuff */</span>
+    <span class="k">for</span> <span class="p">(;;)</span> <span class="p">{</span>
+        <span class="cm">/* do periodic housekeeping once in a few opcodes */</span>
+        <span class="n">opcode</span> <span class="o">=</span> <span class="n">NEXTOP</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">HAS_ARG</span><span class="p">(</span><span class="n">opcode</span><span class="p">))</span> <span class="n">oparg</span> <span class="o">=</span> <span class="n">NEXTARG</span><span class="p">();</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="n">opcode</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nl">NOP</span><span class="p">:</span>
+                <span class="k">goto</span> <span class="n">fast_next_opcode</span><span class="p">;</span>
+            <span class="cm">/* lots of more complex opcode implementations */</span>
+            <span class="k">default</span><span class="o">:</span>
+                <span class="cm">/* become rather unhappy */</span>
+        <span class="p">}</span>
+        <span class="cm">/* handle exceptions or runtime errors, if any */</span>
+    <span class="p">}</span>
+    <span class="cm">/* we are finished, pop the frame stack */</span>
+    <span class="n">tstate</span><span class="o">-&gt;</span><span class="n">frame</span> <span class="o">=</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">f_back</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">retval</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><a href="https://tech.blog.aknin.name/category/my-projects/pythons-innards/">blog post</a> on CPython internals</p>
+<hr />
+<h2>gdb and Python</h2>
+<ul>
+<li>gdb can be built with Python support enabled</li>
+<li>that essentially means one can extend gdb with Python scripts<ul>
+<li>e.g. pretty-printing for C++ STL containers: https://sourceware.org/gdb/wiki/STLSupport</li>
+</ul>
+</li>
+<li>the very same mechanism is <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">used</a> for debugging of CPython</li>
+</ul>
+<hr />
+<h2>Prerequisites: gdb with Python support</h2>
+<div class="codehilite"><pre><span></span>apt-get install gdb
+</pre></div>
+
+
+<p>or</p>
+<div class="codehilite"><pre><span></span>yum install gdb
+</pre></div>
+
+
+<p>or something else depending on the distro you use, then</p>
+<div class="codehilite"><pre><span></span>gdb -ex <span class="s1">&#39;python print(&quot;ok&quot;)&#39;</span> -ex quit <span class="p">|</span> tail -n <span class="m">1</span>
+</pre></div>
+
+
+<hr />
+<h2>Prerequisites: CPython debugging symbols</h2>
+<ul>
+<li>debugging symbols are information on the data type of each variable or function and the correspondence between source line numbers and addresses in the executable code</li>
+<li>generated when applications are compiled with <strong>-g</strong> flag passed to gcc/clang</li>
+<li>consume a lot of disk space, thus, are usually <strong>stripped</strong> from compiled binaries and shipped separately </li>
+</ul>
+<hr />
+<h2>Prerequisites: CPython debugging symbols</h2>
+<div class="codehilite"><pre><span></span> apt-get install python-dbg
+</pre></div>
+
+
+<p>or</p>
+<div class="codehilite"><pre><span></span> yum install python-debuginfo
+</pre></div>
+
+
+<p>CentOS/RHEL put those into a separate <a href="http://debuginfo.centos.org/">repo</a></p>
+<div class="codehilite"><pre><span></span> debuginfo-install python
+</pre></div>
+
+
+<p>Some distros (like Arch Linux) do not ship debugging symbols at all</p>
+<hr />
+<h2>Prerequisites: CPython scripts for gdb</h2>
+<ul>
+<li>developed in CPython code tree: https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py</li>
+<li>packaged and shipped by Linux distros</li>
+<li>loaded by gdb automatically when debugging <strong>python</strong> binary</li>
+<li>can also be loaded manually like<ul>
+<li><code>(gdb) source ~/src/cpython/Tools/gdb/libpython.py</code></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Debug a process from the start</h2>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python
+
+<span class="o">(</span>gdb<span class="o">)</span> run my_python_script.py
+</pre></div>
+
+
+<hr />
+<h2>Attach to a running process</h2>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python -p <span class="nv">$PID</span>
+</pre></div>
+
+
+<p>or simply</p>
+<div class="codehilite"><pre><span></span>gdb -p $PID
+</pre></div>
+
+
+<p>(note: gdb will stop <strong>all</strong> process threads)</p>
+<hr />
+<h2>Load the inferior state from a core dump</h2>
+<p>get a core dump of a running process</p>
+<div class="codehilite"><pre><span></span>gcore <span class="nv">$PID</span>
+</pre></div>
+
+
+<p>open it in gdb</p>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python core.<span class="nv">$PID</span>
+</pre></div>
+
+
+<hr />
+<h2>Print a traceback</h2>
+<div class="codehilite"><pre><span></span>(gdb) py-bt
+Traceback (most recent call first):
+
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 872, in emit
+  stream.write(ufs % msg)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 759, in handle
+  self.emit(record)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1336, in callHandlers
+  hdlr.handle(record)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1296, in handle
+  self.callHandlers(record)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1286, in _log
+  self.handle(record)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1155, in debug
+  self._log(DEBUG, msg, args, **kwargs)
+File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1440, in debug
+  self.logger.debug(msg, *args, **kwargs)
+File &quot;/opt/stack/nova/nova/compute/resource_tracker.py&quot;, line 639, in _report_hypervisor_resource_view
+  &#39;pci_devices&#39;: pci_devices})
+</pre></div>
+
+
+<hr />
+<h2>Print Python code</h2>
+<div class="codehilite"><pre><span></span>(gdb) py-list
+ 867 try:
+ 868     if (isinstance(msg, unicode) and
+ 869         getattr(stream, &#39;encoding&#39;, None)):
+ 870         ufs = u&#39;%s\n&#39;
+ 871         try:
+&gt;872             stream.write(ufs % msg)
+ 873         except UnicodeEncodeError:
+ 874             #Printing to terminals sometimes fails. For example,
+ 875             #with an encoding of &#39;cp1251&#39;, the above write will
+ 876             #work if written to a stream opened or wrapped by
+ 877             #the codecs module, but fail when writing to a
+</pre></div>
+
+
+<hr />
+<h2>Print local variables</h2>
+<div class="codehilite"><pre><span></span>(gdb) py-locals
+self = &lt;ColorHandler(...)&gt;
+stream = &lt;file at remote 0x7fa76ebb61e0&gt;
+fs = &#39;%s\n&#39;
+ufs = u&#39;%s\n&#39;
+</pre></div>
+
+
+<hr />
+<h2>Set a breakpoint in native code</h2>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python
+
+(gdb) break mkdir
+Breakpoint 1 at 0x417600
+
+(gdb) condition 1 $_regex((char*) $rdi, &quot;.*/instances/.*&quot;)
+
+(gdb) commands 1
+Type commands for breakpoint(s) 1, one per line.
+End with a line saying just &quot;end&quot;.
+&gt;py-bt
+&gt;end
+end
+
+(gdb) run -m testtools.run discover -s nova/tests/unit
+</pre></div>
+
+
+<hr />
+<h2>Execute arbitrary Python code in the process context</h2>
+<div class="codehilite"><pre><span></span>(gdb) call PyGILState_Ensure()
+$1 = 1
+(gdb) call PyRun_SimpleString(&quot;1 + 1&quot;)
+$2 = 0
+(gdb) call PyGILState_Release(1)
+</pre></div>
+
+
+<hr />
+<h2>Gotchas: virtual environments and custom CPython builds</h2>
+<ul>
+<li>when attaching to a Python process started in a virtual environment debugging symbols <em>may</em> suddenly not be found anymore</li>
+</ul>
+<div class="codehilite"><pre><span></span>gdb -p $2975
+Attaching to process 2975
+Reading symbols from .../venv/bin/python2...
+(no debugging symbols found)...done.
+</pre></div>
+
+
+<ul>
+<li>it happens because gdb looks for them in the <em>wrong place</em>: if you omit the <em>inferior</em> binary path, gdb tries to derive it from <code>/proc/$PID/exe</code> symlink and then load debugging symbols stored in the predefined path - e.g. <code>/usr/lib/debug/$PATH</code>. For a virtual environment it's not <code>/usr/lib/debug/usr/bin/python2</code>, thus, loading fails</li>
+</ul>
+<hr />
+<h2>Gotchas: virtual environments and custom CPython builds</h2>
+<ul>
+<li>the solution is to <em>always</em> pass the inferior binary path explicitly when attaching to a process</li>
+</ul>
+<div class="codehilite"><pre><span></span>gdb /usr/bin/python2.7 -p $PID 
+</pre></div>
+
+
+<ul>
+<li>alternatively, modern CPython builds (at least on Debian Testing or Ubuntu Xenial) have an associated <code>build-id</code> value, that is used to uniquely identify stripped debugging symbols</li>
+</ul>
+<div class="codehilite"><pre><span></span>objdump -s -j .note.gnu.build-id /usr/bin/python2.7
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>Reading symbols from /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
+</pre></div>
+
+
+<hr />
+<h2>Gotchas: virtual environments and custom CPython builds</h2>
+<ul>
+<li>py- commands may be undefined for a very similar reason </li>
+</ul>
+<div class="codehilite"><pre><span></span>(gdb) py-bt
+Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
+</pre></div>
+
+
+<ul>
+<li>gdb <em>autoloads</em> debugging scripts from <code>$PATH-gdb.py</code> </li>
+</ul>
+<div class="codehilite"><pre><span></span>(gdb) info auto-load
+
+gdb-scripts:  No auto-load scripts.
+libthread-db:  No auto-loaded libthread-db.
+local-gdbinit:  Local .gdbinit file was not found.
+python-scripts:
+Loaded  Script
+Yes     /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
+</pre></div>
+
+
+<hr />
+<h2>Gotchas: virtual environments and custom CPython builds</h2>
+<ul>
+<li>you can always load the scripts manually</li>
+</ul>
+<div class="codehilite"><pre><span></span>(gdb) source /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
+</pre></div>
+
+
+<ul>
+<li>it's also useful for testing of the new versions of gdb scripts shipped with CPython</li>
+</ul>
+<hr />
+<h2>Gotchas: PTRACE_ATTACH not permitted</h2>
+<p>Controlled by <code>/proc/sys/kernel/yama/ptrace_scope</code>, possible values are
+<em> <code>0</code> - a process can <code>PTRACE_ATTACH</code> to any other
+    process running under the same uid
+</em> <code>1</code> - only descendants can be traced (default on Ubuntu)
+<em> <code>2</code> - admin-only attach, or through children calling <code>PTRACE_TRACEME</code>
+</em> <code>3</code> - no processes may use ptrace with <code>PTRACE_ATTACH</code> nor via <code>PTRACE_TRACEME</code></p>
+<hr />
+<h2>Gotchas: python-dbg</h2>
+<ul>
+<li>a separate build of CPython (with <code>--with-pydebug</code> passed to <code>./configure</code>) with many run-time checks enabled, thus, <em>much</em> slower</li>
+<li><strong>not</strong> required for using gdb</li>
+</ul>
+<div class="codehilite"><pre><span></span>$ <span class="nb">time</span> python -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<span class="m">499999500000</span>
+
+real    0m0.096s
+user    0m0.057s
+sys 0m0.030s
+
+$ <span class="nb">time</span> python-dbg -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<span class="m">499999500000</span>
+<span class="o">[</span><span class="m">18318</span> refs<span class="o">]</span>
+
+real    0m0.237s
+user    0m0.197s
+sys 0m0.016s
+</pre></div>
+
+
+<hr />
+<h2>Gotchas: compiler build flags</h2>
+<ul>
+<li>some Linux distros build CPython with <code>-g0</code> or <code>-g1</code> <a href="https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html">flags</a> passed to gcc: the former produces a binary without debugging information at all, and the latter does not allow gdb to get information about local variables at runtime</li>
+<li>the solution is to rebuild CPython with <code>-g</code> or <code>-g2</code> (<code>2</code> is the default value when <code>-g</code> is passed)</li>
+</ul>
+<hr />
+<h2>Gotchas: optimized out frames</h2>
+<ul>
+<li>depending on the <a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html">optimization level</a> used in gcc when building CPython or the concrete compiler version used, it's possible that information on local variables or function arguments will be lost at runtime (e.g. with aggressive optimizations enabled by <code>-O3</code>)</li>
+</ul>
+<div class="codehilite"><pre><span></span>(gdb) py-bt
+Traceback (most recent call first):
+  File &quot;test2.py&quot;, line 9, in g
+    time.sleep(1000)
+  File &quot;test2.py&quot;, line 5, in f
+    g()
+  (frame information optimized out)
+</pre></div>
+
+
+<hr />
+<h2>Gotchas: PyPy, Jython, etc</h2>
+<ul>
+<li>the described debugging technique is only feasible for the CPython interpreter as is, as the gdb extension is specifically written to introspect the state of CPython internals (e.g. PyEval_EvalFrameEx calls)</li>
+<li>for PyPy there is an open <a href="https://bitbucket.org/pypy/pypy/issues/1204/gdb-hooks-for-debugging-pypy">issue</a> on Bitbucket, where it was proposed to provide integration with gdb, but looks like the attached patches have not been merged yet and the person, who wrote those, lost interest in this</li>
+<li>for Jython you could probably use standard tools for debugging of JVM applications, e.g. <a href="http://visualvm.java.net/">VisualVM</a></li>
+</ul>
+<hr />
+<h1>Links</h1>
+<ul>
+<li>gdb Debugging Full Example: http://brendangregg.com/blog/2016-08-09/gdb-example-ncurses.html</li>
+<li>Low-level Python debugging with gdb: http://grapsus.net/blog/post/Low-level-Python-debugging-with-GDB</li>
+<li>pydevd: http://pydev.blogspot.com/2014/09/attaching-debugger-to-running-process.html</li>
+<li>pyringe: https://github.com/google/pyringe</li>
+</ul>
+<hr />
+<h1>Conclusion</h1>
+<ul>
+<li>
+<p>gdb is a powerful tool, that allows one to debug complex problems with crashing or hanging CPython processes, as well as Python code, that does calls to native libraries</p>
+</li>
+<li>
+<p>on modern Linux distros debugging CPython processes with gdb must be as simple as installing of debugging symbols for the concrete interpreter build, although there are a few known gotchas, especially when virtual environments are used</p>
+</li>
+</ul>
+<hr />
+<h2>Questions?</h2>
+<p>Your feedback is <strong>very</strong> appreciated!</p>
+<p>twitter: @rpodoliaka
+email: roman.podoliaka@gmail.com
+blog: http://podoliaka.org
+slides: http://podoliaka.org/talks/</p>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2018 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->

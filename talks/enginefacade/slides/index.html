@@ -1,0 +1,220 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>Untitled</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>Untitled</h1>
+
+    <div class="meta">
+    
+    
+    </div>
+  </header>
+
+  <!-- $theme: default -->
+
+<h1>Switching to the new EngineFacade</h1>
+<p>by Roman Podoliaka</p>
+<p>@rpodoliaka
+irc: <strong>rpodolyaka</strong>
+rpodolyaka@mirantis.com</p>
+<p>slides: http://podoliaka.org/talks/</p>
+<hr />
+<h1>The new EngineFacade</h1>
+<ul>
+<li>spec: https://specs.openstack.org/openstack/oslo-specs/specs/kilo/make-enginefacade-a-facade.html</li>
+<li>implemented by <strong>zzzeek</strong> (Mike Bayer) in Liberty (oslo.db &gt;= 1.12.0)</li>
+<li>a new clean API for using of oslo.db<ul>
+<li>thread-safe initialization</li>
+<li>declarative management of session / connection scope</li>
+<li>easier offloading of read-only transactions to asynchronous replicas</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3>"old" EngineFacade: thread-safe initialization is left up to users</h3>
+<div class="codehilite"><pre><span></span><span class="n">_ENGINE_FACADE</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">_LOCK</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">_create_facade_lazily</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_LOCK</span><span class="p">,</span> <span class="n">_ENGINE_FACADE</span>
+    <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">_LOCK</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">_ENGINE_FACADE</span> <span class="o">=</span> <span class="n">db_session</span><span class="o">.</span><span class="n">EngineFacade</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">CONF</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_ENGINE_FACADE</span>
+</pre></div>
+
+
+<hr />
+<h3>"new" EngineFacade: lazy thread-safe initialization</h3>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">oslo.db</span> <span class="kn">import</span> <span class="n">enginefacade</span> <span class="k">as</span> <span class="n">sql</span>
+
+<span class="nd">@sql.reader</span>
+<span class="k">def</span> <span class="nf">some_api_method</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="c1"># work with context.session</span>
+
+<span class="nd">@sql.writer</span>
+<span class="k">def</span> <span class="nf">some_other_api_method</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="c1"># work with context.session</span>
+</pre></div>
+
+
+<hr />
+<h3>"new" EngineFacade: multiple instances of EngineFacade</h3>
+<div class="codehilite"><pre><span></span><span class="n">main_context_manager</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
+<span class="n">api_context_manager</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
+</pre></div>
+
+
+<hr />
+<h3>"new" EngineFacade: project specific configuration</h3>
+<div class="codehilite"><pre><span></span><span class="n">context_manager</span> <span class="o">=</span> <span class="n">enginefacade</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
+
+<span class="n">context_manager</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">sqlite_fk</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">context_manager</span><span class="o">.</span><span class="n">append_on_engine_create</span><span class="p">(</span><span class="n">set_hook</span><span class="p">)</span>
+</pre></div>
+
+
+<hr />
+<h3>"old" EngineFacade: get_session() boilerplate</h3>
+<div class="codehilite"><pre><span></span><span class="nd">@require_context</span>
+<span class="nd">@handle_db_data_error</span>
+<span class="k">def</span> <span class="nf">snapshot_create</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="n">values</span><span class="p">[</span><span class="s1">&#39;snapshot_metadata&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">_metadata_refs</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">),</span>
+         <span class="n">models</span><span class="o">.</span><span class="n">SnapshotMetadata</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">):</span>
+        <span class="n">values</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">begin</span><span class="p">():</span>
+        <span class="n">snapshot_ref</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Snapshot</span><span class="p">()</span>
+        <span class="n">snapshot_ref</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">snapshot_ref</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_snapshot_get</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+                             <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
+</pre></div>
+
+
+<hr />
+<h3>"old" EngineFacade: private DB API functions</h3>
+<div class="codehilite"><pre><span></span><span class="nd">@require_context</span>
+<span class="k">def</span> <span class="nf">_snapshot_metadata_get</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">snapshot_id</span><span class="p">,</span>
+                           <span class="n">session</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">_snapshot_metadata_get_query</span><span class="p">(</span>
+        <span class="n">context</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<hr />
+<h3>"new" EngineFacade: session scope is managed declaratively</h3>
+<div class="codehilite"><pre><span></span><span class="nd">@main_context_manager.writer</span>
+<span class="k">def</span> <span class="nf">quota_destroy_all_by_project_and_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span>
+                                          <span class="n">project_id</span><span class="p">,</span>
+                                          <span class="n">user_id</span><span class="p">):</span>
+    <span class="n">model_query</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ProjectUserQuota</span><span class="p">,</span>
+                <span class="n">read_deleted</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">)</span><span class="o">.</span>\
+        <span class="n">filter_by</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span><span class="o">.</span>\
+        <span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span>\
+        <span class="n">soft_delete</span><span class="p">(</span><span class="n">synchronize_session</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<hr />
+<h1>What projects are already using the new EngineFacade?</h1>
+<ul>
+<li><a href="https://review.openstack.org/#/q/status:merged+project:openstack/nova+branch:master+topic:bp/new-oslodb-enginefacade">Nova</a></li>
+<li><a href="https://review.openstack.org/#/q/status:merged+project:openstack/neutron+branch:master+topic:bp/enginefacade-switch">Neutron</a></li>
+<li><a href="https://review.openstack.org/#/q/status:merged+project:openstack/ironic+branch:master+topic:enginefacade">Ironic</a></li>
+<li><a href="https://review.openstack.org/#/c/257458/">Keystone</a></li>
+<li>...</li>
+</ul>
+<hr />
+<h1>Need help?</h1>
+<p>Slides:  http://podoliaka.org/talks/</p>
+<p>Bugs: https://bugs.launchpad.net/oslo.db</p>
+<p>Questions:</p>
+<ul>
+<li>IRC<ul>
+<li>
+<h1>openstack-oslo at freenode</h1>
+</li>
+<li><strong>zzzeek</strong> (Mike Bayer)</li>
+<li><strong>rpodolyaka</strong> (Roman Podoliaka)</li>
+</ul>
+</li>
+<li>ML<ul>
+<li>http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev</li>
+<li>tag with <strong>[oslo][db]</strong></li>
+</ul>
+</li>
+</ul>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2018 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->
