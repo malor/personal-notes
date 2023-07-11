@@ -5,13 +5,12 @@ author: Roman Podoliaka
 About me
 ========
 
-Hey! I'm Roman, a software engineer from Kharkiv, Ukraine.
+Hey! I'm Roman, a software engineer from Ukraine who currently lives in Ireland.
 
 My programming language of choice is Python, as it allows me to be efficient and easily
-express my thoughts. I used to do some C / C++ / Java programming before and keep using
-these languages, but usually only when I need to read or modify someone else's code.
-I'm also a big fan of Clojure (from pragmatic perspective) and Haskell (from aesthetic
-perspective), as well as functional programming in general.
+express my thoughts. I used to do some C / C++ / Java programming in the past and keep using
+those languages, but usually only when I need to read or modify someone else's code.
+I'm also a big fan of Rust and Clojure and use them occassionally for various pet projects.
 
 My main areas of expertise are:
 
@@ -19,7 +18,7 @@ My main areas of expertise are:
 
 * system programming
 
-* (relational) databases
+* (relational) databases and storage systems in general
 
 
 Short bio:
@@ -27,9 +26,7 @@ Short bio:
 
 * __Name__: Roman Podoliaka
 * __Nickname__: malor
-* __Age__: 27
-* __Gender__: Male
-* __Location__: Kharkiv, Ukraine
+* __Location__: Dublin, Ireland
 
 
 Contact
