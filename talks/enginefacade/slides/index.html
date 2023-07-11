@@ -63,52 +63,48 @@ rpodolyaka@mirantis.com</p>
 </ul>
 <hr />
 <h3>"old" EngineFacade: thread-safe initialization is left up to users</h3>
-<div class="codehilite"><pre><span></span><span class="n">_ENGINE_FACADE</span> <span class="o">=</span> <span class="bp">None</span>
+<div class="codehilite"><pre><span></span><code><span class="n">_ENGINE_FACADE</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_LOCK</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">_create_facade_lazily</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">_LOCK</span><span class="p">,</span> <span class="n">_ENGINE_FACADE</span>
-    <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">_LOCK</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_ENGINE_FACADE</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">_ENGINE_FACADE</span> <span class="o">=</span> <span class="n">db_session</span><span class="o">.</span><span class="n">EngineFacade</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">CONF</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_ENGINE_FACADE</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"new" EngineFacade: lazy thread-safe initialization</h3>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">oslo.db</span> <span class="kn">import</span> <span class="n">enginefacade</span> <span class="k">as</span> <span class="n">sql</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">oslo.db</span> <span class="kn">import</span> <span class="n">enginefacade</span> <span class="k">as</span> <span class="n">sql</span>
 
-<span class="nd">@sql.reader</span>
+<span class="nd">@sql</span><span class="o">.</span><span class="n">reader</span>
 <span class="k">def</span> <span class="nf">some_api_method</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
     <span class="c1"># work with context.session</span>
 
-<span class="nd">@sql.writer</span>
+<span class="nd">@sql</span><span class="o">.</span><span class="n">writer</span>
 <span class="k">def</span> <span class="nf">some_other_api_method</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
     <span class="c1"># work with context.session</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"new" EngineFacade: multiple instances of EngineFacade</h3>
-<div class="codehilite"><pre><span></span><span class="n">main_context_manager</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">main_context_manager</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
 <span class="n">api_context_manager</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"new" EngineFacade: project specific configuration</h3>
-<div class="codehilite"><pre><span></span><span class="n">context_manager</span> <span class="o">=</span> <span class="n">enginefacade</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
+<div class="codehilite"><pre><span></span><code><span class="n">context_manager</span> <span class="o">=</span> <span class="n">enginefacade</span><span class="o">.</span><span class="n">transaction_context</span><span class="p">()</span>
 
-<span class="n">context_manager</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">sqlite_fk</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">context_manager</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">sqlite_fk</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">context_manager</span><span class="o">.</span><span class="n">append_on_engine_create</span><span class="p">(</span><span class="n">set_hook</span><span class="p">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"old" EngineFacade: get_session() boilerplate</h3>
-<div class="codehilite"><pre><span></span><span class="nd">@require_context</span>
+<div class="codehilite"><pre><span></span><code><span class="nd">@require_context</span>
 <span class="nd">@handle_db_data_error</span>
 <span class="k">def</span> <span class="nf">snapshot_create</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
     <span class="n">values</span><span class="p">[</span><span class="s1">&#39;snapshot_metadata&#39;</span><span class="p">]</span> <span class="o">=</span> \
@@ -125,14 +121,13 @@ rpodolyaka@mirantis.com</p>
 
         <span class="k">return</span> <span class="n">_snapshot_get</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
                              <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"old" EngineFacade: private DB API functions</h3>
-<div class="codehilite"><pre><span></span><span class="nd">@require_context</span>
+<div class="codehilite"><pre><span></span><code><span class="nd">@require_context</span>
 <span class="k">def</span> <span class="nf">_snapshot_metadata_get</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">snapshot_id</span><span class="p">,</span>
-                           <span class="n">session</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                           <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">rows</span> <span class="o">=</span> <span class="n">_snapshot_metadata_get_query</span><span class="p">(</span>
         <span class="n">context</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
@@ -140,12 +135,11 @@ rpodolyaka@mirantis.com</p>
         <span class="n">result</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">result</span>
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h3>"new" EngineFacade: session scope is managed declaratively</h3>
-<div class="codehilite"><pre><span></span><span class="nd">@main_context_manager.writer</span>
+<div class="codehilite"><pre><span></span><code><span class="nd">@main_context_manager</span><span class="o">.</span><span class="n">writer</span>
 <span class="k">def</span> <span class="nf">quota_destroy_all_by_project_and_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span>
                                           <span class="n">project_id</span><span class="p">,</span>
                                           <span class="n">user_id</span><span class="p">):</span>
@@ -153,9 +147,8 @@ rpodolyaka@mirantis.com</p>
                 <span class="n">read_deleted</span><span class="o">=</span><span class="s2">&quot;no&quot;</span><span class="p">)</span><span class="o">.</span>\
         <span class="n">filter_by</span><span class="p">(</span><span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span><span class="o">.</span>\
         <span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span>\
-        <span class="n">soft_delete</span><span class="p">(</span><span class="n">synchronize_session</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-</pre></div>
-
+        <span class="n">soft_delete</span><span class="p">(</span><span class="n">synchronize_session</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h1>What projects are already using the new EngineFacade?</h1>

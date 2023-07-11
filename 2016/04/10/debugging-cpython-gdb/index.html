@@ -93,36 +93,34 @@ interpreter level, not the application level: i.e. you will see functions and
 variables of the interpreter, not of your app.</p>
 <p>To give you an example, let's take a look at a <code>gdb</code> backtrace of a CPython
 (the most popular Python interpreter) process:</p>
-<div class="codehilite"><pre><span></span>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
+<div class="codehilite"><pre><span></span><code>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
 #1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
 #2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
 #3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
 #4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
 #5  call_function () at ../Python/ceval.c:4041
 #6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
-</pre></div>
-
+</code></pre></div>
 
 <p>and one obtained by the means of <code>traceback.extract_stack()</code>:</p>
-<div class="codehilite"><pre><span></span>/usr/local/lib/python2.7/dist-packages/eventlet/greenpool.py:82 in _spawn_n_impl
-    `func(*args, **kwargs)`
+<div class="codehilite"><pre><span></span><code><span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">greenpool</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">82</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_spawn_n_impl</span>
+<span class="w">    </span><span class="err">`</span><span class="nx">func</span><span class="p">(</span><span class="o">*</span><span class="nx">args</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="nx">kwargs</span><span class="p">)</span><span class="err">`</span>
 
-/opt/stack/neutron/neutron/agent/l3/agent.py:461 in _process_router_update
-    `for rp, update in self._queue.each_update_to_next_router():`
+<span class="o">/</span><span class="nx">opt</span><span class="o">/</span><span class="nx">stack</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">agent</span><span class="o">/</span><span class="nx">l3</span><span class="o">/</span><span class="nx">agent</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">461</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_process_router_update</span>
+<span class="w">    </span><span class="err">`</span><span class="k">for</span><span class="w"> </span><span class="nx">rp</span><span class="p">,</span><span class="w"> </span><span class="nx">update</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">_queue</span><span class="p">.</span><span class="nx">each_update_to_next_router</span><span class="p">():</span><span class="err">`</span>
 
-/opt/stack/neutron/neutron/agent/l3/router_processing_queue.py:154 in each_update_to_next_router
-    `next_update = self._queue.get()`
+<span class="o">/</span><span class="nx">opt</span><span class="o">/</span><span class="nx">stack</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">agent</span><span class="o">/</span><span class="nx">l3</span><span class="o">/</span><span class="nx">router_processing_queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">154</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">each_update_to_next_router</span>
+<span class="w">    </span><span class="err">`</span><span class="nx">next_update</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">_queue</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span><span class="err">`</span>
 
-/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:313 in get
-    `return waiter.wait()`
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">313</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">get</span>
+<span class="w">    </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="nx">waiter</span><span class="p">.</span><span class="nx">wait</span><span class="p">()</span><span class="err">`</span>
 
-/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:141 in wait
-   `return get_hub().switch()`
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">141</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">wait</span>
+<span class="w">   </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="nx">get_hub</span><span class="p">().</span><span class="nx">switch</span><span class="p">()</span><span class="err">`</span>
 
-/usr/local/lib/python2.7/dist-packages/eventlet/hubs/hub.py:294 in switch
-    `return self.greenlet.switch()`
-</pre></div>
-
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">hubs</span><span class="o">/</span><span class="nx">hub</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">294</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">switch</span>
+<span class="w">    </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">greenlet</span><span class="p">.</span><span class="nx">switch</span><span class="p">()</span><span class="err">`</span>
+</code></pre></div>
 
 <p>As is, the former is of little help, when you are trying to find a problem
 in your Python code, and all you see is the current state of the interpreter
@@ -145,31 +143,26 @@ of course!</p>
 </ul>
 <h2>Debugging Python with gdb 101</h2>
 <p>First of all, you need to install <code>gdb</code>:</p>
-<div class="codehilite"><pre><span></span># apt-get install gdb
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># apt-get install gdb
+</code></pre></div>
 
 <p>or</p>
-<div class="codehilite"><pre><span></span># yum install gdb
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># yum install gdb
+</code></pre></div>
 
 <p>depending on the Linux distro you are using.</p>
 <p>The next step is to install <a href="http://www.tutorialspoint.com/gnu_debugger/gdb_debugging_symbols.htm">debugging symbols</a> for the CPython build you have:</p>
-<div class="codehilite"><pre><span></span># apt-get install python-dbg
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># apt-get install python-dbg
+</code></pre></div>
 
 <p>or</p>
-<div class="codehilite"><pre><span></span># yum install python-debuginfo
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># yum install python-debuginfo
+</code></pre></div>
 
 <p>Some Linux distros like CentOS or RHEL ship debugging symbols <a href="http://debuginfo.centos.org/">separately</a> from
 all other packages and recommend to install those like:</p>
-<div class="codehilite"><pre><span></span># debuginfo-install python
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code># debuginfo-install python
+</code></pre></div>
 
 <p>The installed debugging symbols will be used by the CPython <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">script</a> for <code>gdb</code>
 in order to analyze the <code>PyEval_EvalFrameEx</code> frames (a frame essentially is a
@@ -180,58 +173,54 @@ manipulate the process memory in any way you want, but you can't easily
 understand what data structures reside in what memory areas.</p>
 <p>After all preparatory steps have been completed, you can give <code>gdb</code> a try. E.g.
 in order to attach to a running CPython process, do:</p>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python -p $PID
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb /usr/bin/python -p $PID
+</code></pre></div>
 
 <p>At this point you can get an application level backtrace for the current
 thread (note that some frames are "missing" - this is expected, as <code>gdb</code>
 counts all the interpreter level frames and only some of those are calls
 in application level code - <code>PyEval_EvalFrameEx</code> ones):</p>
-<div class="codehilite"><pre><span></span>(gdb) py-bt
+<div class="codehilite"><pre><span></span><code><span class="ss">(</span><span class="nv">gdb</span><span class="ss">)</span><span class="w"> </span><span class="nv">py</span><span class="o">-</span><span class="nv">bt</span>
 
-#4 Frame 0x1b7da60, for file /usr/lib/python2.7/sched.py, line 111, in run (self=&lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;, q=[...], delayfunc=&lt;built-in function sleep&gt;, timefunc=&lt;built-in function time&gt;, pop=&lt;built-in function heappop&gt;, time=&lt;float at remote 0x1a0a400&gt;, priority=1, action=&lt;function at remote 0x7fe1fa083aa0&gt;, argument=(171657,), checked_event=&lt;...&gt;, now=&lt;float at remote 0x1b8ec58&gt;)
-    delayfunc(time - now)
-#7 Frame 0x1b87e90, for file /usr/bin/dstat, line 2416, in main (interval=1, user=&#39;ubuntu&#39;, hostname=&#39;rpodolyaka-devstack&#39;, key=&#39;unit_hi&#39;, linewidth=150, plugin=&#39;page&#39;, mods=(&#39;page&#39;, &#39;page24&#39;), mod=&#39;page&#39;, pluginfile=&#39;dstat_page&#39;, scheduler=&lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;)
-    scheduler.run()
-#11 Frame 0x7fe1fa0bc5c0, for file /usr/bin/dstat, line 2554, in &lt;module&gt; ()
-    main()
-</pre></div>
-
+<span class="sc">#4</span><span class="w"> </span><span class="nv">Frame</span><span class="w"> </span><span class="mi">0</span><span class="nv">x1b7da60</span>,<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">file</span><span class="w"> </span><span class="o">/</span><span class="nv">usr</span><span class="o">/</span><span class="nv">lib</span><span class="o">/</span><span class="nv">python2</span>.<span class="mi">7</span><span class="o">/</span><span class="nv">sched</span>.<span class="nv">py</span>,<span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="mi">111</span>,<span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">run</span><span class="w"> </span><span class="ss">(</span><span class="nv">self</span><span class="o">=&lt;</span><span class="nv">scheduler</span><span class="ss">(</span><span class="nv">timefunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">time</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">delayfunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">sleep</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">_queue</span><span class="o">=</span>[<span class="o">&lt;</span><span class="nv">Event</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1f8c74a10</span><span class="o">&gt;</span>]<span class="ss">)</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1fa086758</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">q</span><span class="o">=</span>[...],<span class="w"> </span><span class="nv">delayfunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">sleep</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">timefunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">time</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">pop</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">heappop</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">time</span><span class="o">=&lt;</span><span class="nv">float</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x1a0a400</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">priority</span><span class="o">=</span><span class="mi">1</span>,<span class="w"> </span><span class="nv">action</span><span class="o">=&lt;</span><span class="nv">function</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1fa083aa0</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">argument</span><span class="o">=</span><span class="ss">(</span><span class="mi">171657</span>,<span class="ss">)</span>,<span class="w"> </span><span class="nv">checked_event</span><span class="o">=&lt;</span>...<span class="o">&gt;</span>,<span class="w"> </span><span class="nv">now</span><span class="o">=&lt;</span><span class="nv">float</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x1b8ec58</span><span class="o">&gt;</span><span class="ss">)</span>
+<span class="w">    </span><span class="nv">delayfunc</span><span class="ss">(</span><span class="nv">time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">now</span><span class="ss">)</span>
+<span class="sc">#7</span><span class="w"> </span><span class="nv">Frame</span><span class="w"> </span><span class="mi">0</span><span class="nv">x1b87e90</span>,<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">file</span><span class="w"> </span><span class="o">/</span><span class="nv">usr</span><span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">dstat</span>,<span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="mi">2416</span>,<span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="ss">(</span><span class="nv">interval</span><span class="o">=</span><span class="mi">1</span>,<span class="w"> </span><span class="nv">user</span><span class="o">=</span><span class="s1">&#39;ubuntu&#39;</span>,<span class="w"> </span><span class="nv">hostname</span><span class="o">=</span><span class="s1">&#39;rpodolyaka-devstack&#39;</span>,<span class="w"> </span><span class="nv">key</span><span class="o">=</span><span class="s1">&#39;unit_hi&#39;</span>,<span class="w"> </span><span class="nv">linewidth</span><span class="o">=</span><span class="mi">150</span>,<span class="w"> </span><span class="nv">plugin</span><span class="o">=</span><span class="s1">&#39;page&#39;</span>,<span class="w"> </span><span class="nv">mods</span><span class="o">=</span><span class="ss">(</span><span class="s1">&#39;page&#39;</span>,<span class="w"> </span><span class="s1">&#39;page24&#39;</span><span class="ss">)</span>,<span class="w"> </span><span class="nv">mod</span><span class="o">=</span><span class="s1">&#39;page&#39;</span>,<span class="w"> </span><span class="nv">pluginfile</span><span class="o">=</span><span class="s1">&#39;dstat_page&#39;</span>,<span class="w"> </span><span class="nv">scheduler</span><span class="o">=&lt;</span><span class="nv">scheduler</span><span class="ss">(</span><span class="nv">timefunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">time</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">delayfunc</span><span class="o">=&lt;</span><span class="nv">built</span><span class="o">-</span><span class="nv">in</span><span class="w"> </span><span class="nv">function</span><span class="w"> </span><span class="nv">sleep</span><span class="o">&gt;</span>,<span class="w"> </span><span class="nv">_queue</span><span class="o">=</span>[<span class="o">&lt;</span><span class="nv">Event</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1f8c74a10</span><span class="o">&gt;</span>]<span class="ss">)</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">remote</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1fa086758</span><span class="o">&gt;</span><span class="ss">)</span>
+<span class="w">    </span><span class="nv">scheduler</span>.<span class="nv">run</span><span class="ss">()</span>
+<span class="sc">#11</span><span class="w"> </span><span class="nv">Frame</span><span class="w"> </span><span class="mi">0</span><span class="nv">x7fe1fa0bc5c0</span>,<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">file</span><span class="w"> </span><span class="o">/</span><span class="nv">usr</span><span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">dstat</span>,<span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="mi">2554</span>,<span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="o">&lt;</span><span class="nv">module</span><span class="o">&gt;</span><span class="w"> </span><span class="ss">()</span>
+<span class="w">    </span><span class="nv">main</span><span class="ss">()</span>
+</code></pre></div>
 
 <p>or find out what exact line of the application code is currently being executed:</p>
-<div class="codehilite"><pre><span></span>(gdb) py-list
+<div class="codehilite"><pre><span></span><code><span class="ss">(</span><span class="nv">gdb</span><span class="ss">)</span><span class="w"> </span><span class="nv">py</span><span class="o">-</span><span class="nv">list</span>
 
- 106            pop = heapq.heappop
- 107            while q:
- 108                time, priority, action, argument = checked_event = q[0]
- 109                now = timefunc()
- 110                if now &lt; time:
-&gt;111                    delayfunc(time - now)
- 112                else:
- 113                    event = pop(q)
- 114                    # Verify that the event was not removed or altered
- 115                    # by another thread after we last looked at q[0].
- 116                    if event is checked_event:
-</pre></div>
-
+<span class="w"> </span><span class="mi">106</span><span class="w">            </span><span class="nv">pop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">heapq</span>.<span class="nv">heappop</span>
+<span class="w"> </span><span class="mi">107</span><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="nv">q</span>:
+<span class="w"> </span><span class="mi">108</span><span class="w">                </span><span class="nv">time</span>,<span class="w"> </span><span class="nv">priority</span>,<span class="w"> </span><span class="nv">action</span>,<span class="w"> </span><span class="nv">argument</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">checked_event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">q</span>[<span class="mi">0</span>]
+<span class="w"> </span><span class="mi">109</span><span class="w">                </span><span class="nv">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">timefunc</span><span class="ss">()</span>
+<span class="w"> </span><span class="mi">110</span><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="nv">now</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nv">time</span>:
+<span class="o">&gt;</span><span class="mi">111</span><span class="w">                    </span><span class="nv">delayfunc</span><span class="ss">(</span><span class="nv">time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">now</span><span class="ss">)</span>
+<span class="w"> </span><span class="mi">112</span><span class="w">                </span><span class="k">else</span>:
+<span class="w"> </span><span class="mi">113</span><span class="w">                    </span><span class="nv">event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">pop</span><span class="ss">(</span><span class="nv">q</span><span class="ss">)</span>
+<span class="w"> </span><span class="mi">114</span><span class="w">                    </span>#<span class="w"> </span><span class="nv">Verify</span><span class="w"> </span><span class="nv">that</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">event</span><span class="w"> </span><span class="nv">was</span><span class="w"> </span><span class="nv">not</span><span class="w"> </span><span class="nv">removed</span><span class="w"> </span><span class="nv">or</span><span class="w"> </span><span class="nv">altered</span>
+<span class="w"> </span><span class="mi">115</span><span class="w">                    </span>#<span class="w"> </span><span class="nv">by</span><span class="w"> </span><span class="nv">another</span><span class="w"> </span><span class="nv">thread</span><span class="w"> </span><span class="nv">after</span><span class="w"> </span><span class="nv">we</span><span class="w"> </span><span class="nv">last</span><span class="w"> </span><span class="nv">looked</span><span class="w"> </span><span class="nv">at</span><span class="w"> </span><span class="nv">q</span>[<span class="mi">0</span>].
+<span class="w"> </span><span class="mi">116</span><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="nv">event</span><span class="w"> </span><span class="nv">is</span><span class="w"> </span><span class="nv">checked_event</span>:
+</code></pre></div>
 
 <p>or look at values of local variables:</p>
-<div class="codehilite"><pre><span></span>(gdb) py-locals
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">py</span><span class="o">-</span><span class="n">locals</span>
 
-self = &lt;scheduler(timefunc=&lt;built-in function time&gt;, delayfunc=&lt;built-in function sleep&gt;, _queue=[&lt;Event at remote 0x7fe1f8c74a10&gt;]) at remote 0x7fe1fa086758&gt;
-q = [&lt;Event at remote 0x7fe1f8c74a10&gt;]
-delayfunc = &lt;built-in function sleep&gt;
-timefunc = &lt;built-in function time&gt;
-pop = &lt;built-in function heappop&gt;
-time = &lt;float at remote 0x1a0a400&gt;
-priority = 1
-action = &lt;function at remote 0x7fe1fa083aa0&gt;
-argument = (171657,)
-checked_event = &lt;Event at remote 0x7fe1f8c74a10&gt;
-now = &lt;float at remote 0x1b8ec58&gt;
-</pre></div>
-
+<span class="bp">self</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">scheduler</span><span class="p">(</span><span class="n">timefunc</span><span class="o">=&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">time</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">delayfunc</span><span class="o">=&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">sleep</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">_queue</span><span class="o">=</span><span class="p">[</span><span class="o">&lt;</span><span class="n">Event</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x7fe1f8c74a10</span><span class="o">&gt;</span><span class="p">])</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x7fe1fa086758</span><span class="o">&gt;</span>
+<span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&lt;</span><span class="n">Event</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x7fe1f8c74a10</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="n">delayfunc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">sleep</span><span class="o">&gt;</span>
+<span class="n">timefunc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">time</span><span class="o">&gt;</span>
+<span class="n">pop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span><span class="w"> </span><span class="n">function</span><span class="w"> </span><span class="n">heappop</span><span class="o">&gt;</span>
+<span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="nb nb-Type">float</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x1a0a400</span><span class="o">&gt;</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">function</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x7fe1fa083aa0</span><span class="o">&gt;</span>
+<span class="n">argument</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">171657</span><span class="p">,)</span>
+<span class="n">checked_event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Event</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x7fe1f8c74a10</span><span class="o">&gt;</span>
+<span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="nb nb-Type">float</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="k">remote</span><span class="w"> </span><span class="mh">0x1b8ec58</span><span class="o">&gt;</span>
+</code></pre></div>
 
 <p>There are more <code>py-</code> commands provided by the CPython <a href="https://github.com/python/cpython/blob/master/Tools/gdb/libpython.py">script</a> for <code>gdb</code>.
 Check out the debugging <a href="https://docs.python.org/devguide/gdb.html">guide</a> for details.</p>
@@ -247,22 +236,21 @@ to save disk space), but also provide an additional CPython binary
 passed to <code>./configure</code>) with many run-time checks.  Generally, you don't want
 to use <code>python-dbg</code> in production, as it can be (much) slower than <code>python</code>,
 e.g.:</p>
-<div class="codehilite"><pre><span></span>$ <span class="nb">time</span> python -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
 <span class="m">499999500000</span>
 
-real    0m0.096s
-user    0m0.057s
-sys 0m0.030s
+real<span class="w">    </span>0m0.096s
+user<span class="w">    </span>0m0.057s
+sys<span class="w"> </span>0m0.030s
 
-$ <span class="nb">time</span> python-dbg -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>python-dbg<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
 <span class="m">499999500000</span>
-<span class="o">[</span><span class="m">18318</span> refs<span class="o">]</span>
+<span class="o">[</span><span class="m">18318</span><span class="w"> </span>refs<span class="o">]</span>
 
-real    0m0.237s
-user    0m0.197s
-sys 0m0.016s
-</pre></div>
-
+real<span class="w">    </span>0m0.237s
+user<span class="w">    </span>0m0.197s
+sys<span class="w"> </span>0m0.016s
+</code></pre></div>
 
 <p>The good thing is, that you don't need to: it's still possible to debug
 <code>python</code> executable by the means of <code>gdb</code>, as long as the corresponding debugging
@@ -284,43 +272,42 @@ Debian Jessie, CentOS/RHEL 7) ship the "correctly" built CPython.</p>
 compiler version used, it's possible that this information will be lost at
 runtime (especially with aggressive optimizations enabled by <code>-O3</code>). In this
 case <code>gdb</code> will show you something like:</p>
-<div class="codehilite"><pre><span></span>(gdb) bt
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">bt</span>
 
-#0  0x00007fdf3ca31be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
-#1  0x00000000005d1da4 in pysleep (secs=&lt;optimized out&gt;) at ../Modules/timemodule.c:1408
-#2  time_sleep () at ../Modules/timemodule.c:231
-#3  0x00000000004f5465 in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b184c0) at ../Python/ceval.c:4637
-#4  PyEval_EvalFrameEx () at ../Python/ceval.c:3185
-#5  0x00000000004f5194 in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7fff62b185c0, 
-    func=&lt;optimized out&gt;) at ../Python/ceval.c:4750
-#6  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b185c0) at ../Python/ceval.c:4677
-#7  PyEval_EvalFrameEx () at ../Python/ceval.c:3185
-#8  0x00000000004f5194 in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7fff62b186c0, 
-    func=&lt;optimized out&gt;) at ../Python/ceval.c:4750
-#9  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7fff62b186c0) at ../Python/ceval.c:4677
-#10 PyEval_EvalFrameEx () at ../Python/ceval.c:3185
-#11 0x00000000005c5da8 in _PyEval_EvalCodeWithName.lto_priv.1326 () at ../Python/ceval.c:3965
-#12 0x00000000005e9d7f in PyEval_EvalCodeEx () at ../Python/ceval.c:3986
-#13 PyEval_EvalCode (co=&lt;optimized out&gt;, globals=&lt;optimized out&gt;, locals=&lt;optimized out&gt;) at ../Python/ceval.c:777
-#14 0x00000000005fe3d2 in run_mod () at ../Python/pythonrun.c:970
-#15 0x000000000060057a in PyRun_FileExFlags () at ../Python/pythonrun.c:923
-#16 0x000000000060075c in PyRun_SimpleFileExFlags () at ../Python/pythonrun.c:396
-#17 0x000000000062b870 in run_file (p_cf=0x7fff62b18920, filename=0x1733260 L&quot;test2.py&quot;, fp=0x1790190) at ../Modules/main.c:318
-#18 Py_Main () at ../Modules/main.c:768
-#19 0x00000000004cb8ef in main () at ../Programs/python.c:69
-#20 0x00007fdf3c970610 in __libc_start_main (main=0x4cb810 &lt;main&gt;, argc=2, argv=0x7fff62b18b38, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
-    rtld_fini=&lt;optimized out&gt;, stack_end=0x7fff62b18b28) at libc-start.c:291
-#21 0x00000000005c9df9 in _start ()
+<span class="err">#</span><span class="mi">0</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">fdf3ca31be3</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__select_nocancel</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">sysdeps</span><span class="o">/</span><span class="nx">unix</span><span class="o">/</span><span class="nx">syscall</span><span class="o">-</span><span class="nx">template</span><span class="p">.</span><span class="nx">S</span><span class="p">:</span><span class="mi">84</span>
+<span class="err">#</span><span class="mi">1</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000005</span><span class="nx">d1da4</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">pysleep</span><span class="w"> </span><span class="p">(</span><span class="nx">secs</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">timemodule</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">1408</span>
+<span class="err">#</span><span class="mi">2</span><span class="w">  </span><span class="nx">time_sleep</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">timemodule</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">231</span>
+<span class="err">#</span><span class="mi">3</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">f5465</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b184c0</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4637</span>
+<span class="err">#</span><span class="mi">4</span><span class="w">  </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3185</span>
+<span class="err">#</span><span class="mi">5</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">f5194</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">fast_function</span><span class="w"> </span><span class="p">(</span><span class="nx">nk</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">na</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">n</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b185c0</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">func</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4750</span>
+<span class="err">#</span><span class="mi">6</span><span class="w">  </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b185c0</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4677</span>
+<span class="err">#</span><span class="mi">7</span><span class="w">  </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3185</span>
+<span class="err">#</span><span class="mi">8</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">f5194</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">fast_function</span><span class="w"> </span><span class="p">(</span><span class="nx">nk</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">na</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">n</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b186c0</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">func</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4750</span>
+<span class="err">#</span><span class="mi">9</span><span class="w">  </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b186c0</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4677</span>
+<span class="err">#</span><span class="mi">10</span><span class="w"> </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3185</span>
+<span class="err">#</span><span class="mi">11</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000005</span><span class="nx">c5da8</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_PyEval_EvalCodeWithName</span><span class="p">.</span><span class="nx">lto_priv</span><span class="m m-Double">.1</span><span class="mi">326</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3965</span>
+<span class="err">#</span><span class="mi">12</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000005</span><span class="nx">e9d7f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalCodeEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3986</span>
+<span class="err">#</span><span class="mi">13</span><span class="w"> </span><span class="nx">PyEval_EvalCode</span><span class="w"> </span><span class="p">(</span><span class="nx">co</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">globals</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">locals</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">777</span>
+<span class="err">#</span><span class="mi">14</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000005</span><span class="nx">fe3d2</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">run_mod</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">970</span>
+<span class="err">#</span><span class="mi">15</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000060057</span><span class="nx">a</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_FileExFlags</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">923</span>
+<span class="err">#</span><span class="mi">16</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000060075</span><span class="nx">c</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_SimpleFileExFlags</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">396</span>
+<span class="err">#</span><span class="mi">17</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000062</span><span class="nx">b870</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">run_file</span><span class="w"> </span><span class="p">(</span><span class="nx">p_cf</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b18920</span><span class="p">,</span><span class="w"> </span><span class="nx">filename</span><span class="p">=</span><span class="mh">0x1</span><span class="mi">733260</span><span class="w"> </span><span class="nx">L</span><span class="s">&quot;test2.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">fp</span><span class="p">=</span><span class="mh">0x1</span><span class="mi">790190</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">main</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">318</span>
+<span class="err">#</span><span class="mi">18</span><span class="w"> </span><span class="nx">Py_Main</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">main</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">768</span>
+<span class="err">#</span><span class="mi">19</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">cb8ef</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">main</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Programs</span><span class="o">/</span><span class="nx">python</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">69</span>
+<span class="err">#</span><span class="mi">20</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">fdf3c970610</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__libc_start_main</span><span class="w"> </span><span class="p">(</span><span class="nx">main</span><span class="p">=</span><span class="mh">0x4</span><span class="nx">cb810</span><span class="w"> </span><span class="p">&lt;</span><span class="nx">main</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">argc</span><span class="p">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">argv</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b18b38</span><span class="p">,</span><span class="w"> </span><span class="nx">init</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">rtld_fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">stack_end</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">fff62b18b28</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="nx">libc</span><span class="o">-</span><span class="nx">start</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">291</span>
+<span class="err">#</span><span class="mi">21</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000005</span><span class="nx">c9df9</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_start</span><span class="w"> </span><span class="p">()</span>
 
-(gdb) py-bt
-Traceback (most recent call first):
-  File &quot;test2.py&quot;, line 9, in g
-    time.sleep(1000)
-  File &quot;test2.py&quot;, line 5, in f
-    g()
-  (frame information optimized out)
-</pre></div>
-
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">py</span><span class="o">-</span><span class="nx">bt</span>
+<span class="nx">Traceback</span><span class="w"> </span><span class="p">(</span><span class="nx">most</span><span class="w"> </span><span class="nx">recent</span><span class="w"> </span><span class="nx">call</span><span class="w"> </span><span class="nx">first</span><span class="p">):</span>
+<span class="w">  </span><span class="nx">File</span><span class="w"> </span><span class="s">&quot;test2.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">g</span>
+<span class="w">    </span><span class="nx">time</span><span class="p">.</span><span class="nx">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="w">  </span><span class="nx">File</span><span class="w"> </span><span class="s">&quot;test2.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">f</span>
+<span class="w">    </span><span class="nx">g</span><span class="p">()</span>
+<span class="w">  </span><span class="p">(</span><span class="nx">frame</span><span class="w"> </span><span class="nx">information</span><span class="w"> </span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">)</span>
+</code></pre></div>
 
 <p>i.e. some application level frames will be available, some will not.
 There is little you can do at this point, except for rebuilding CPython
@@ -338,33 +325,32 @@ purpose CPU registers, that compilers can use for storing the values of function
 call arguments and local variables.</p>
 <p>The following command prints the values of all CPU registers in the selected
 stack frame:</p>
-<div class="codehilite"><pre><span></span>(gdb) info registers
-rax            0xfffffffffffffdfe   -514
-rbx            0x7ffff7fd7c20   140737353972768
-rcx            0x7ffff7afaff7   140737348874231
-rdx            0x0  0
-rsi            0x0  0
-rdi            0x0  0
-rbp            0x7ffff7fd7d98   0x7ffff7fd7d98
-rsp            0x7fffffffe3c0   0x7fffffffe3c0
-r8             0x7fffffffe050   140737488347216
-r9             0x0  0
-r10            0x0  0
-r11            0x246    582
-r12            0x0  0
-r13            0x7ffff7fae050   140737353801808
-r14            0x7ffff7fae050   140737353801808
-r15            0x0  0
-rip            0x5555556468ca   0x5555556468ca &lt;PyEval_EvalCodeEx+1754&gt;
-eflags         0x246    [ PF ZF IF ]
-cs             0x33 51
-ss             0x2b 43
-ds             0x0  0
-es             0x0  0
-fs             0x0  0
-gs             0x0  0
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="n">registers</span>
+<span class="n">rax</span><span class="w">            </span><span class="mh">0</span><span class="n">xfffffffffffffdfe</span><span class="w">   </span><span class="o">-</span><span class="mh">514</span>
+<span class="n">rbx</span><span class="w">            </span><span class="mh">0</span><span class="n">x7ffff7fd7c20</span><span class="w">   </span><span class="mh">140737353972768</span>
+<span class="n">rcx</span><span class="w">            </span><span class="mh">0</span><span class="n">x7ffff7afaff7</span><span class="w">   </span><span class="mh">140737348874231</span>
+<span class="n">rdx</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">rsi</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">rdi</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">rbp</span><span class="w">            </span><span class="mh">0</span><span class="n">x7ffff7fd7d98</span><span class="w">   </span><span class="mh">0</span><span class="n">x7ffff7fd7d98</span>
+<span class="n">rsp</span><span class="w">            </span><span class="mh">0</span><span class="n">x7fffffffe3c0</span><span class="w">   </span><span class="mh">0</span><span class="n">x7fffffffe3c0</span>
+<span class="n">r8</span><span class="w">             </span><span class="mh">0</span><span class="n">x7fffffffe050</span><span class="w">   </span><span class="mh">140737488347216</span>
+<span class="n">r9</span><span class="w">             </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">r10</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">r11</span><span class="w">            </span><span class="mh">0</span><span class="n">x246</span><span class="w">    </span><span class="mh">582</span>
+<span class="n">r12</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">r13</span><span class="w">            </span><span class="mh">0</span><span class="n">x7ffff7fae050</span><span class="w">   </span><span class="mh">140737353801808</span>
+<span class="n">r14</span><span class="w">            </span><span class="mh">0</span><span class="n">x7ffff7fae050</span><span class="w">   </span><span class="mh">140737353801808</span>
+<span class="n">r15</span><span class="w">            </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">rip</span><span class="w">            </span><span class="mh">0</span><span class="n">x5555556468ca</span><span class="w">   </span><span class="mh">0</span><span class="n">x5555556468ca</span><span class="w"> </span><span class="o">&lt;</span><span class="n">PyEval_EvalCodeEx</span><span class="o">+</span><span class="mh">1754</span><span class="o">&gt;</span>
+<span class="n">eflags</span><span class="w">         </span><span class="mh">0</span><span class="n">x246</span><span class="w">    </span><span class="p">[</span><span class="w"> </span><span class="n">PF</span><span class="w"> </span><span class="n">ZF</span><span class="w"> </span><span class="n">IF</span><span class="w"> </span><span class="p">]</span>
+<span class="n">cs</span><span class="w">             </span><span class="mh">0</span><span class="n">x33</span><span class="w"> </span><span class="mh">51</span>
+<span class="n">ss</span><span class="w">             </span><span class="mh">0</span><span class="n">x2b</span><span class="w"> </span><span class="mh">43</span>
+<span class="n">ds</span><span class="w">             </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">es</span><span class="w">             </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">fs</span><span class="w">             </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+<span class="n">gs</span><span class="w">             </span><span class="mh">0</span><span class="n">x0</span><span class="w">  </span><span class="mh">0</span>
+</code></pre></div>
 
 <p>But these are just numbers. We need to help gdb put some meaning behind them.</p>
 <p>Note, that some of the numbers above clearly look like memory addresses. We can ask
@@ -374,16 +360,15 @@ on the actual type internally (e.g. <code>-&gt;ob_type-&gt;tp_name</code> field 
 name encoded as a C-string).</p>
 <p>So what we'll do is try to cast the value of each CPU register to <code>PyObject*</code> and
 see if we can find anything useful:</p>
-<div class="codehilite"><pre><span></span>(gdb) p ((PyObject*) $rax)-&gt;ob_type-&gt;tp_name
-Cannot access memory at address 0xfffffffffffffe06
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="p">((</span><span class="nx">PyObject</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="err">$</span><span class="nx">rax</span><span class="p">)</span><span class="o">-&gt;</span><span class="nx">ob_type</span><span class="o">-&gt;</span><span class="nx">tp_name</span>
+<span class="nx">Cannot</span><span class="w"> </span><span class="nx">access</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="mh">0xf</span><span class="nx">ffffffffffffe06</span>
+</code></pre></div>
 
 <p>If we give gdb a memory address, that does not actually point to a <code>PyObject</code> instance,
 we'll get an error on pointer dereference.</p>
 <p>There are only so many CPU registers to check.  And you can easily automate this search by the
 means of a helper gdb command similar to:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">LocatePyFrameObject</span><span class="p">(</span><span class="n">gdb</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">LocatePyFrameObject</span><span class="p">(</span><span class="n">gdb</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
     <span class="s1">&#39;Locate the CPU register that contains the value of PyFrameObject* in the selected stack frame&#39;</span>
 
     <span class="n">REGISTERS</span> <span class="o">=</span> <span class="p">(</span>
@@ -409,30 +394,28 @@ means of a helper gdb command similar to:</p>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">read_register</span><span class="p">(</span><span class="n">register</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">gdb_type</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;ob_type&#39;</span><span class="p">][</span><span class="s1">&#39;tp_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;frame&#39;</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="n">register</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">register</span><span class="p">)</span>
                     <span class="k">return</span>
             <span class="k">except</span> <span class="n">gdb</span><span class="o">.</span><span class="n">MemoryError</span><span class="p">:</span>
                 <span class="c1"># if either cast or pointer dereference fails, then it&#39;s not a valid PyFrameObjectPtr*</span>
                 <span class="k">continue</span>
 
 <span class="n">LocatePyFrameObject</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>E.g., my CPython build puts the pointer to <code>PyFrameObject</code> to the CPU register RBX:</p>
-<div class="codehilite"><pre><span></span>(gdb) py-locate-frame
-rbx
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">py</span><span class="o">-</span><span class="nx">locate</span><span class="o">-</span><span class="nx">frame</span>
+<span class="nx">rbx</span>
 
-(gdb) p ((PyObject*) $rbx)-&gt;ob_type-&gt;tp_name
-$28 = 0x5555557472ef &quot;frame&quot;
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="p">((</span><span class="nx">PyObject</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="err">$</span><span class="nx">rbx</span><span class="p">)</span><span class="o">-&gt;</span><span class="nx">ob_type</span><span class="o">-&gt;</span><span class="nx">tp_name</span>
+<span class="err">$</span><span class="mi">28</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mh">0x5</span><span class="mi">555557472</span><span class="nx">ef</span><span class="w"> </span><span class="s">&quot;frame&quot;</span>
 
-(gdb) p (PyFrameObject*) $rbx
-$29 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in &lt;module&gt; ()
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="p">(</span><span class="nx">PyFrameObject</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="err">$</span><span class="nx">rbx</span>
+<span class="err">$</span><span class="mi">29</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">Frame</span><span class="w"> </span><span class="mh">0x7</span><span class="nx">ffff7fd7c20</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">test2</span><span class="p">.</span><span class="nx">py</span><span class="p">,</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="w"> </span><span class="p">()</span>
 
-(gdb) p (PyObject*) $rbx
-$30 = Frame 0x7ffff7fd7c20, for file test2.py, line 12, in &lt;module&gt; ()
-</pre></div>
-
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="p">(</span><span class="nx">PyObject</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="err">$</span><span class="nx">rbx</span>
+<span class="err">$</span><span class="mi">30</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">Frame</span><span class="w"> </span><span class="mh">0x7</span><span class="nx">ffff7fd7c20</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="nx">test2</span><span class="p">.</span><span class="nx">py</span><span class="p">,</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="w"> </span><span class="p">()</span>
+</code></pre></div>
 
 <p>Note, that the loaded <code>libpython-gdb.py</code> script provides pretty-printing for
 <code>PyFrameObject</code> data structure, as well it's able to figure out a specific
@@ -444,52 +427,50 @@ manually.</p>
 but it can be the only way of debugging "optimized out" frames.</p>
 <h2>Virtual environments and custom CPython builds</h2>
 <p>When a virtual environment is used, it may appear that the extension does not work:</p>
-<div class="codehilite"><pre><span></span>(gdb) bt
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">bt</span>
 
-#0  0x00007ff2df3d0be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
-#1  0x0000000000588c4a in ?? ()
-#2  0x00000000004bad9a in PyEval_EvalFrameEx ()
-#3  0x00000000004bfd1f in PyEval_EvalFrameEx ()
-#4  0x00000000004bfd1f in PyEval_EvalFrameEx ()
-#5  0x00000000004b8556 in PyEval_EvalCodeEx ()
-#6  0x00000000004e91ef in ?? ()
-#7  0x00000000004e3d92 in PyRun_FileExFlags ()
-#8  0x00000000004e2646 in PyRun_SimpleFileExFlags ()
-#9  0x0000000000491c23 in Py_Main ()
-#10 0x00007ff2df30f610 in __libc_start_main (main=0x491670 &lt;main&gt;, argc=2, argv=0x7ffc36f11cf8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
-    rtld_fini=&lt;optimized out&gt;, stack_end=0x7ffc36f11ce8) at libc-start.c:291
-#11 0x000000000049159b in _start ()
+<span class="err">#</span><span class="mi">0</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">ff2df3d0be3</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__select_nocancel</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">sysdeps</span><span class="o">/</span><span class="nx">unix</span><span class="o">/</span><span class="nx">syscall</span><span class="o">-</span><span class="nx">template</span><span class="p">.</span><span class="nx">S</span><span class="p">:</span><span class="mi">84</span>
+<span class="err">#</span><span class="mi">1</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">000000000588</span><span class="nx">c4a</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">??</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">2</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">bad9a</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">3</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">bfd1f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">4</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">bfd1f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">5</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">b8556</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalCodeEx</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">6</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">e91ef</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">??</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">7</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">e3d92</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_FileExFlags</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">8</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">e2646</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_SimpleFileExFlags</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">9</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">000000000491</span><span class="nx">c23</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">Py_Main</span><span class="w"> </span><span class="p">()</span>
+<span class="err">#</span><span class="mi">10</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">ff2df30f610</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__libc_start_main</span><span class="w"> </span><span class="p">(</span><span class="nx">main</span><span class="p">=</span><span class="mh">0x4</span><span class="mi">91670</span><span class="w"> </span><span class="p">&lt;</span><span class="nx">main</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">argc</span><span class="p">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">argv</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffc36f11cf8</span><span class="p">,</span><span class="w"> </span><span class="nx">init</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">rtld_fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">stack_end</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffc36f11ce8</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="nx">libc</span><span class="o">-</span><span class="nx">start</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">291</span>
+<span class="err">#</span><span class="mi">11</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000049159</span><span class="nx">b</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_start</span><span class="w"> </span><span class="p">()</span>
 
-(gdb) py-bt
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">py</span><span class="o">-</span><span class="nx">bt</span>
 
-Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
-</pre></div>
-
+<span class="nx">Undefined</span><span class="w"> </span><span class="nx">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;py-bt&quot;</span><span class="p">.</span><span class="w">  </span><span class="nx">Try</span><span class="w"> </span><span class="s">&quot;help&quot;</span><span class="p">.</span>
+</code></pre></div>
 
 <p><code>gdb</code> can still follow the CPython frames, but information on <code>PyEval_EvalCodeEx</code>
 calls is not available.</p>
 <p>If you scroll up the <code>gdb</code> output a bit, you'll see that <code>gdb</code> failed to find
 the debugging symbols for <code>python</code> executable:</p>
-<div class="codehilite"><pre><span></span>$ gdb -p <span class="m">2975</span>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>gdb<span class="w"> </span>-p<span class="w"> </span><span class="m">2975</span>
 
-GNU gdb <span class="o">(</span>Debian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
-Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2015</span> Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;show copying&quot;</span>
-and <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> details.
-This GDB was configured as <span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
-Type <span class="s2">&quot;show configuration&quot;</span> <span class="k">for</span> configuration details.
-For bug reporting instructions, please see:
+GNU<span class="w"> </span>gdb<span class="w"> </span><span class="o">(</span>Debian<span class="w"> </span><span class="m">7</span>.10-1+b1<span class="o">)</span><span class="w"> </span><span class="m">7</span>.10
+Copyright<span class="w"> </span><span class="o">(</span>C<span class="o">)</span><span class="w"> </span><span class="m">2015</span><span class="w"> </span>Free<span class="w"> </span>Software<span class="w"> </span>Foundation,<span class="w"> </span>Inc.
+License<span class="w"> </span>GPLv3+:<span class="w"> </span>GNU<span class="w"> </span>GPL<span class="w"> </span>version<span class="w"> </span><span class="m">3</span><span class="w"> </span>or<span class="w"> </span>later<span class="w"> </span>&lt;http://gnu.org/licenses/gpl.html&gt;
+This<span class="w"> </span>is<span class="w"> </span>free<span class="w"> </span>software:<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>and<span class="w"> </span>redistribute<span class="w"> </span>it.
+There<span class="w"> </span>is<span class="w"> </span>NO<span class="w"> </span>WARRANTY,<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>extent<span class="w"> </span>permitted<span class="w"> </span>by<span class="w"> </span>law.<span class="w">  </span>Type<span class="w"> </span><span class="s2">&quot;show copying&quot;</span>
+and<span class="w"> </span><span class="s2">&quot;show warranty&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>details.
+This<span class="w"> </span>GDB<span class="w"> </span>was<span class="w"> </span>configured<span class="w"> </span>as<span class="w"> </span><span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;show configuration&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>configuration<span class="w"> </span>details.
+For<span class="w"> </span>bug<span class="w"> </span>reporting<span class="w"> </span>instructions,<span class="w"> </span>please<span class="w"> </span>see:
 &lt;http://www.gnu.org/software/gdb/bugs/&gt;.
-Find the GDB manual and other documentation resources online at:
+Find<span class="w"> </span>the<span class="w"> </span>GDB<span class="w"> </span>manual<span class="w"> </span>and<span class="w"> </span>other<span class="w"> </span>documentation<span class="w"> </span>resources<span class="w"> </span>online<span class="w"> </span>at:
 &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
-For help, <span class="nb">type</span> <span class="s2">&quot;help&quot;</span>.
-Type <span class="s2">&quot;apropos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;word&quot;</span>.
-Attaching to process <span class="m">2975</span>
-Reading symbols from /home/rpodolyaka/workspace/venvs/default/bin/python2...<span class="o">(</span>no debugging symbols found<span class="o">)</span>...done.
-</pre></div>
-
+For<span class="w"> </span>help,<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s2">&quot;help&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;apropos word&quot;</span><span class="w"> </span>to<span class="w"> </span>search<span class="w"> </span><span class="k">for</span><span class="w"> </span>commands<span class="w"> </span>related<span class="w"> </span>to<span class="w"> </span><span class="s2">&quot;word&quot;</span>.
+Attaching<span class="w"> </span>to<span class="w"> </span>process<span class="w"> </span><span class="m">2975</span>
+Reading<span class="w"> </span>symbols<span class="w"> </span>from<span class="w"> </span>/home/rpodolyaka/workspace/venvs/default/bin/python2...<span class="o">(</span>no<span class="w"> </span>debugging<span class="w"> </span>symbols<span class="w"> </span>found<span class="o">)</span>...done.
+</code></pre></div>
 
 <p>How is a virtual environment any different? Why did not <code>gdb</code> find the debugging symbols?</p>
 <p>First and foremost, the path to <code>python</code> executable is different. Note, that I
@@ -503,130 +484,123 @@ debugging symbols from <code>/usr/lib/debug/home/rpodolyaka/workspace/venvs/defa
 obviously, did not find anything there.</p>
 <p>The solution is simple - specify the executable under debug explicitly when
 running <code>gdb</code>:</p>
-<div class="codehilite"><pre><span></span>$ gdb /usr/bin/python2.7 -p <span class="nv">$PID</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>gdb<span class="w"> </span>/usr/bin/python2.7<span class="w"> </span>-p<span class="w"> </span><span class="nv">$PID</span>
+</code></pre></div>
 
 <p>Thus, <code>gdb</code> will look for debugging symbols in the "right" place -
 <code>/usr/lib/debug/usr/bin/python2.7</code>.</p>
 <p>It's also worth mentioning, that it's possible that debugging symbols for a
 particular executable are identified by a unique <code>build-id</code> value stored
 in <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> executable headers. E.g. CPython on my Debian machine:</p>
-<div class="codehilite"><pre><span></span>$ objdump -s -j .note.gnu.build-id /usr/bin/python2.7
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>objdump<span class="w"> </span>-s<span class="w"> </span>-j<span class="w"> </span>.note.gnu.build-id<span class="w"> </span>/usr/bin/python2.7
 
-/usr/bin/python2.7:     file format elf64-x86-64
+/usr/bin/python2.7:<span class="w">     </span>file<span class="w"> </span>format<span class="w"> </span>elf64-x86-64
 
-Contents of section .note.gnu.build-id:
- <span class="m">400274</span> <span class="m">04000000</span> <span class="m">14000000</span> <span class="m">03000000</span> 474e5500  ............GNU.
- <span class="m">400284</span> 8d04a3ae 38521cb7 c7928e4a 7c8b1ed3  ....8R.....J<span class="p">|</span>...
- <span class="m">400294</span> 85e763e4
-</pre></div>
-
+Contents<span class="w"> </span>of<span class="w"> </span>section<span class="w"> </span>.note.gnu.build-id:
+<span class="w"> </span><span class="m">400274</span><span class="w"> </span><span class="m">04000000</span><span class="w"> </span><span class="m">14000000</span><span class="w"> </span><span class="m">03000000</span><span class="w"> </span>474e5500<span class="w">  </span>............GNU.
+<span class="w"> </span><span class="m">400284</span><span class="w"> </span>8d04a3ae<span class="w"> </span>38521cb7<span class="w"> </span>c7928e4a<span class="w"> </span>7c8b1ed3<span class="w">  </span>....8R.....J<span class="p">|</span>...
+<span class="w"> </span><span class="m">400294</span><span class="w"> </span>85e763e4
+</code></pre></div>
 
 <p>In this case <code>gdb</code> will look for debugging symbols using the <code>build-id</code> value:</p>
-<div class="codehilite"><pre><span></span>$ gdb /usr/bin/python2.7
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>gdb<span class="w"> </span>/usr/bin/python2.7
 
-GNU gdb <span class="o">(</span>Debian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
-Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">2015</span> Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;show copying&quot;</span>
-and <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> details.
-This GDB was configured as <span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
-Type <span class="s2">&quot;show configuration&quot;</span> <span class="k">for</span> configuration details.
-For bug reporting instructions, please see:
+GNU<span class="w"> </span>gdb<span class="w"> </span><span class="o">(</span>Debian<span class="w"> </span><span class="m">7</span>.10-1+b1<span class="o">)</span><span class="w"> </span><span class="m">7</span>.10
+Copyright<span class="w"> </span><span class="o">(</span>C<span class="o">)</span><span class="w"> </span><span class="m">2015</span><span class="w"> </span>Free<span class="w"> </span>Software<span class="w"> </span>Foundation,<span class="w"> </span>Inc.
+License<span class="w"> </span>GPLv3+:<span class="w"> </span>GNU<span class="w"> </span>GPL<span class="w"> </span>version<span class="w"> </span><span class="m">3</span><span class="w"> </span>or<span class="w"> </span>later<span class="w"> </span>&lt;http://gnu.org/licenses/gpl.html&gt;
+This<span class="w"> </span>is<span class="w"> </span>free<span class="w"> </span>software:<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>and<span class="w"> </span>redistribute<span class="w"> </span>it.
+There<span class="w"> </span>is<span class="w"> </span>NO<span class="w"> </span>WARRANTY,<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>extent<span class="w"> </span>permitted<span class="w"> </span>by<span class="w"> </span>law.<span class="w">  </span>Type<span class="w"> </span><span class="s2">&quot;show copying&quot;</span>
+and<span class="w"> </span><span class="s2">&quot;show warranty&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>details.
+This<span class="w"> </span>GDB<span class="w"> </span>was<span class="w"> </span>configured<span class="w"> </span>as<span class="w"> </span><span class="s2">&quot;x86_64-linux-gnu&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;show configuration&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>configuration<span class="w"> </span>details.
+For<span class="w"> </span>bug<span class="w"> </span>reporting<span class="w"> </span>instructions,<span class="w"> </span>please<span class="w"> </span>see:
 &lt;http://www.gnu.org/software/gdb/bugs/&gt;.
-Find the GDB manual and other documentation resources online at:
+Find<span class="w"> </span>the<span class="w"> </span>GDB<span class="w"> </span>manual<span class="w"> </span>and<span class="w"> </span>other<span class="w"> </span>documentation<span class="w"> </span>resources<span class="w"> </span>online<span class="w"> </span>at:
 &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
-For help, <span class="nb">type</span> <span class="s2">&quot;help&quot;</span>.
-Type <span class="s2">&quot;apropos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;word&quot;</span>...
-Reading symbols from /usr/bin/python2.7...Reading symbols from /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
+For<span class="w"> </span>help,<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s2">&quot;help&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;apropos word&quot;</span><span class="w"> </span>to<span class="w"> </span>search<span class="w"> </span><span class="k">for</span><span class="w"> </span>commands<span class="w"> </span>related<span class="w"> </span>to<span class="w"> </span><span class="s2">&quot;word&quot;</span>...
+Reading<span class="w"> </span>symbols<span class="w"> </span>from<span class="w"> </span>/usr/bin/python2.7...Reading<span class="w"> </span>symbols<span class="w"> </span>from<span class="w"> </span>/usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
 <span class="k">done</span>.
-</pre></div>
-
+</code></pre></div>
 
 <p>This has a nice implication - it no longer matters how the executable is called:
 <code>virtualenv</code> just creates a copy of the specified interpreter executable, thus,
 both executables - the one in <code>/usr/bin/</code> and the one in your virtual environment
 will use the very same debugging symbols:</p>
-<div class="codehilite"><pre><span></span>$ gdb -p <span class="m">11150</span>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>gdb<span class="w"> </span>-p<span class="w"> </span><span class="m">11150</span>
 
-GNU gdb <span class="o">(</span>ebian <span class="m">7</span>.10-1+b1<span class="o">)</span> <span class="m">7</span>.10
-Copyright <span class="o">()</span> <span class="m">2015</span> Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version <span class="m">3</span> or later &lt;http://gnu.org/licenses/gpl.html&gt;
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type <span class="s2">&quot;how copying&quot;</span>
-and <span class="s2">&quot;how warranty&quot;</span> <span class="k">for</span> details.
-This GDB was configured as <span class="s2">&quot;86_64-linux-gnu&quot;</span>.
-Type <span class="s2">&quot;how configuration&quot;</span> <span class="k">for</span> configuration details.
-For bug reporting instructions, please see:
+GNU<span class="w"> </span>gdb<span class="w"> </span><span class="o">(</span>ebian<span class="w"> </span><span class="m">7</span>.10-1+b1<span class="o">)</span><span class="w"> </span><span class="m">7</span>.10
+Copyright<span class="w"> </span><span class="o">()</span><span class="w"> </span><span class="m">2015</span><span class="w"> </span>Free<span class="w"> </span>Software<span class="w"> </span>Foundation,<span class="w"> </span>Inc.
+License<span class="w"> </span>GPLv3+:<span class="w"> </span>GNU<span class="w"> </span>GPL<span class="w"> </span>version<span class="w"> </span><span class="m">3</span><span class="w"> </span>or<span class="w"> </span>later<span class="w"> </span>&lt;http://gnu.org/licenses/gpl.html&gt;
+This<span class="w"> </span>is<span class="w"> </span>free<span class="w"> </span>software:<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>free<span class="w"> </span>to<span class="w"> </span>change<span class="w"> </span>and<span class="w"> </span>redistribute<span class="w"> </span>it.
+There<span class="w"> </span>is<span class="w"> </span>NO<span class="w"> </span>WARRANTY,<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>extent<span class="w"> </span>permitted<span class="w"> </span>by<span class="w"> </span>law.<span class="w">  </span>Type<span class="w"> </span><span class="s2">&quot;how copying&quot;</span>
+and<span class="w"> </span><span class="s2">&quot;how warranty&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>details.
+This<span class="w"> </span>GDB<span class="w"> </span>was<span class="w"> </span>configured<span class="w"> </span>as<span class="w"> </span><span class="s2">&quot;86_64-linux-gnu&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;how configuration&quot;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>configuration<span class="w"> </span>details.
+For<span class="w"> </span>bug<span class="w"> </span>reporting<span class="w"> </span>instructions,<span class="w"> </span>please<span class="w"> </span>see:
 &lt;http://www.gnu.org/software/gdb/bugs/&gt;.
-Find the GDB manual and other documentation resources online at:
+Find<span class="w"> </span>the<span class="w"> </span>GDB<span class="w"> </span>manual<span class="w"> </span>and<span class="w"> </span>other<span class="w"> </span>documentation<span class="w"> </span>resources<span class="w"> </span>online<span class="w"> </span>at:
 &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
-For help, <span class="nb">type</span> <span class="s2">&quot;elp&quot;</span>.
-Type <span class="s2">&quot;propos word&quot;</span> to search <span class="k">for</span> commands related to <span class="s2">&quot;ord&quot;</span>.
-Attaching to process <span class="m">11150</span>
-Reading symbols from /home/rpodolyaka/sandbox/testvenv/bin/python2.7...Reading symbols from
+For<span class="w"> </span>help,<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="s2">&quot;elp&quot;</span>.
+Type<span class="w"> </span><span class="s2">&quot;propos word&quot;</span><span class="w"> </span>to<span class="w"> </span>search<span class="w"> </span><span class="k">for</span><span class="w"> </span>commands<span class="w"> </span>related<span class="w"> </span>to<span class="w"> </span><span class="s2">&quot;ord&quot;</span>.
+Attaching<span class="w"> </span>to<span class="w"> </span>process<span class="w"> </span><span class="m">11150</span>
+Reading<span class="w"> </span>symbols<span class="w"> </span>from<span class="w"> </span>/home/rpodolyaka/sandbox/testvenv/bin/python2.7...Reading<span class="w"> </span>symbols<span class="w"> </span>from
 /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
 
-$ ls -la /proc/11150/exe
-lrwxrwxrwx <span class="m">1</span> rpodolyaka rpodolyaka <span class="m">0</span> Apr <span class="m">10</span> <span class="m">15</span>:18 /proc/11150/exe -&gt; /home/rpodolyaka/sandbox/testvenv/bin/python2.7
-</pre></div>
-
+$<span class="w"> </span>ls<span class="w"> </span>-la<span class="w"> </span>/proc/11150/exe
+lrwxrwxrwx<span class="w"> </span><span class="m">1</span><span class="w"> </span>rpodolyaka<span class="w"> </span>rpodolyaka<span class="w"> </span><span class="m">0</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="m">15</span>:18<span class="w"> </span>/proc/11150/exe<span class="w"> </span>-&gt;<span class="w"> </span>/home/rpodolyaka/sandbox/testvenv/bin/python2.7
+</code></pre></div>
 
 <p>The first problem is solved, <code>bt</code> output now looks much nicer, but <code>py-bt</code> command is still
 undefined:</p>
-<div class="codehilite"><pre><span></span>(gdb) bt
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">bt</span>
 
-#0  0x00007f3e95083be3 in __select_nocancel () at ../sysdeps/unix/syscall-template.S:84
-#1  0x0000000000594a59 in floatsleep (secs=&lt;optimized out&gt;) at ../Modules/timemodule.c:948
-#2  time_sleep.lto_priv () at ../Modules/timemodule.c:206
-#3  0x00000000004c524a in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb5045b0) at ../Python/ceval.c:4350
-#4  PyEval_EvalFrameEx () at ../Python/ceval.c:2987
-#5  0x00000000004ca95f in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7ffefb504700, 
-    func=0x7f3e95f78c80) at ../Python/ceval.c:4435
-#6  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb504700) at ../Python/ceval.c:4370
-#7  PyEval_EvalFrameEx () at ../Python/ceval.c:2987
-#8  0x00000000004ca95f in fast_function (nk=&lt;optimized out&gt;, na=&lt;optimized out&gt;, n=&lt;optimized out&gt;, pp_stack=0x7ffefb504850, 
-    func=0x7f3e95f78c08) at ../Python/ceval.c:4435
-#9  call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffefb504850) at ../Python/ceval.c:4370
-#10 PyEval_EvalFrameEx () at ../Python/ceval.c:2987
-#11 0x00000000004c32e5 in PyEval_EvalCodeEx () at ../Python/ceval.c:3582
-#12 0x00000000004c3089 in PyEval_EvalCode (co=&lt;optimized out&gt;, globals=&lt;optimized out&gt;, locals=&lt;optimized out&gt;) at ../Python/ceval.c:669
-#13 0x00000000004f263f in run_mod.lto_priv () at ../Python/pythonrun.c:1376
-#14 0x00000000004ecf52 in PyRun_FileExFlags () at ../Python/pythonrun.c:1362
-#15 0x00000000004eb6d1 in PyRun_SimpleFileExFlags () at ../Python/pythonrun.c:948
-#16 0x000000000049e2d8 in Py_Main () at ../Modules/main.c:640
-#17 0x00007f3e94fc2610 in __libc_start_main (main=0x49dc00 &lt;main&gt;, argc=2, argv=0x7ffefb504c98, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, 
-    rtld_fini=&lt;optimized out&gt;, stack_end=0x7ffefb504c88) at libc-start.c:291
-#18 0x000000000049db29 in _start ()
+<span class="err">#</span><span class="mi">0</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">f3e95083be3</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__select_nocancel</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">sysdeps</span><span class="o">/</span><span class="nx">unix</span><span class="o">/</span><span class="nx">syscall</span><span class="o">-</span><span class="nx">template</span><span class="p">.</span><span class="nx">S</span><span class="p">:</span><span class="mi">84</span>
+<span class="err">#</span><span class="mi">1</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">000000000594</span><span class="nx">a59</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">floatsleep</span><span class="w"> </span><span class="p">(</span><span class="nx">secs</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">timemodule</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">948</span>
+<span class="err">#</span><span class="mi">2</span><span class="w">  </span><span class="nx">time_sleep</span><span class="p">.</span><span class="nx">lto_priv</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">timemodule</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">206</span>
+<span class="err">#</span><span class="mi">3</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">c524a</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb5045b0</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4350</span>
+<span class="err">#</span><span class="mi">4</span><span class="w">  </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">2987</span>
+<span class="err">#</span><span class="mi">5</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">ca95f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">fast_function</span><span class="w"> </span><span class="p">(</span><span class="nx">nk</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">na</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">n</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504700</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">func</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">f3e95f78c80</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4435</span>
+<span class="err">#</span><span class="mi">6</span><span class="w">  </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504700</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4370</span>
+<span class="err">#</span><span class="mi">7</span><span class="w">  </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">2987</span>
+<span class="err">#</span><span class="mi">8</span><span class="w">  </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">ca95f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">fast_function</span><span class="w"> </span><span class="p">(</span><span class="nx">nk</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">na</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">n</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504850</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">func</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">f3e95f78c08</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4435</span>
+<span class="err">#</span><span class="mi">9</span><span class="w">  </span><span class="nx">call_function</span><span class="w"> </span><span class="p">(</span><span class="nx">oparg</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">pp_stack</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504850</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">4370</span>
+<span class="err">#</span><span class="mi">10</span><span class="w"> </span><span class="nx">PyEval_EvalFrameEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">2987</span>
+<span class="err">#</span><span class="mi">11</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">c32e5</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalCodeEx</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">3582</span>
+<span class="err">#</span><span class="mi">12</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">c3089</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyEval_EvalCode</span><span class="w"> </span><span class="p">(</span><span class="nx">co</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">globals</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">locals</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">ceval</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">669</span>
+<span class="err">#</span><span class="mi">13</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">f263f</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">run_mod</span><span class="p">.</span><span class="nx">lto_priv</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">1376</span>
+<span class="err">#</span><span class="mi">14</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">ecf52</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_FileExFlags</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">1362</span>
+<span class="err">#</span><span class="mi">15</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0000000004</span><span class="nx">eb6d1</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">PyRun_SimpleFileExFlags</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Python</span><span class="o">/</span><span class="nx">pythonrun</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">948</span>
+<span class="err">#</span><span class="mi">16</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000049</span><span class="nx">e2d8</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">Py_Main</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="p">..</span><span class="o">/</span><span class="nx">Modules</span><span class="o">/</span><span class="nx">main</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">640</span>
+<span class="err">#</span><span class="mi">17</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">0007</span><span class="nx">f3e94fc2610</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">__libc_start_main</span><span class="w"> </span><span class="p">(</span><span class="nx">main</span><span class="p">=</span><span class="mh">0x4</span><span class="mi">9</span><span class="nx">dc00</span><span class="w"> </span><span class="p">&lt;</span><span class="nx">main</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">argc</span><span class="p">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nx">argv</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504c98</span><span class="p">,</span><span class="w"> </span><span class="nx">init</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span>
+<span class="w">    </span><span class="nx">rtld_fini</span><span class="p">=&lt;</span><span class="nx">optimized</span><span class="w"> </span><span class="nx">out</span><span class="p">&gt;,</span><span class="w"> </span><span class="nx">stack_end</span><span class="p">=</span><span class="mh">0x7</span><span class="nx">ffefb504c88</span><span class="p">)</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="nx">libc</span><span class="o">-</span><span class="nx">start</span><span class="p">.</span><span class="nx">c</span><span class="p">:</span><span class="mi">291</span>
+<span class="err">#</span><span class="mi">18</span><span class="w"> </span><span class="mh">0x0</span><span class="mi">00000000049</span><span class="nx">db29</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_start</span><span class="w"> </span><span class="p">()</span>
 
-(gdb) py-bt
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">py</span><span class="o">-</span><span class="nx">bt</span>
 
-Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
-</pre></div>
-
+<span class="nx">Undefined</span><span class="w"> </span><span class="nx">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;py-bt&quot;</span><span class="p">.</span><span class="w">  </span><span class="nx">Try</span><span class="w"> </span><span class="s">&quot;help&quot;</span><span class="p">.</span>
+</code></pre></div>
 
 <p>Once again, this is caused by the fact that <code>python</code> binary in a virtual
 environment has a different path. By default, <code>gdb</code> will try to <a href="https://sourceware.org/gdb/onlinedocs/gdb/Python-Auto_002dloading.html#set%20auto%2dload%20python%2dscripts">auto-load</a>
 Python extensions for a particular object file under debug, if they exist.
 Specifically, <code>gdb</code> will look for <code>objfile-gdb.py</code> and try to <code>source</code> it on
 start:</p>
-<div class="codehilite"><pre><span></span>(gdb) info auto-load
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span>
 
-gdb-scripts:  No auto-load scripts.
-libthread-db:  No auto-loaded libthread-db.
-local-gdbinit:  Local .gdbinit file was not found.
-python-scripts:
-Loaded  Script
-Yes     /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
-</pre></div>
-
+<span class="n">gdb</span><span class="o">-</span><span class="n">scripts</span><span class="p">:</span><span class="w">  </span><span class="n">No</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="w"> </span><span class="n">scripts</span><span class="o">.</span>
+<span class="n">libthread</span><span class="o">-</span><span class="n">db</span><span class="p">:</span><span class="w">  </span><span class="n">No</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="n">loaded</span><span class="w"> </span><span class="n">libthread</span><span class="o">-</span><span class="n">db</span><span class="o">.</span>
+<span class="n">local</span><span class="o">-</span><span class="n">gdbinit</span><span class="p">:</span><span class="w">  </span><span class="n">Local</span><span class="w"> </span><span class="o">.</span><span class="n">gdbinit</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">found</span><span class="o">.</span>
+<span class="n">python</span><span class="o">-</span><span class="n">scripts</span><span class="p">:</span>
+<span class="n">Loaded</span><span class="w">  </span><span class="n">Script</span>
+<span class="n">Yes</span><span class="w">     </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">gdb</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
 
 <p>If, for some reason this has not been done, you can always do it manually:</p>
-<div class="codehilite"><pre><span></span>(gdb) source /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">gdb</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
 
 <p>e.g. if you want to test a new version of the <code>gdb</code> extension shipped with CPython.</p>
 <h2>PyPy, Jython, etc</h2>

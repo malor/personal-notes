@@ -59,18 +59,18 @@ useful for the people who haven't heard about iterators before.</p>
 <p>Lets consider the following problem: we need a function that would return an index of
 the maximum element in a given array of integers. We could implement it like this:</p>
 <pre class="code cpp literal-block">
-<span class="kt">int</span> <span class="nf">max_element</span><span class="p">(</span><span class="kt">int</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">max_element</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arr</span><span class="p">[],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span>
-            <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">len</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span><span class="w">
+            </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">max</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>This code works perfectly but it has a huge limitation though - it works only for arrays of <code>int</code> elements.
 To find a maximum element in an array of floats we would have to write completely the same code and
@@ -79,19 +79,19 @@ a solution for this problem - <em>templates</em>.</p>
 <p>A generalized version of the function which returns an index of maximum element in an array of any type
 (precisely, for which the relation <em>greater than</em> is defined):</p>
 <pre class="code cpp literal-block">
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="kt">int</span> <span class="n">max_element</span><span class="p">(</span><span class="n">T</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">len</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="kt">int</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">arr</span><span class="p">[],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span>
-            <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">len</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">arr</span><span class="p">[</span><span class="n">max</span><span class="p">])</span><span class="w">
+            </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">max</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>Now we must be satisfied. But what if we wanted to search for the maximum element only in a small part of
 the whole array?</p>
@@ -105,26 +105,26 @@ we choosen an open range <code>[begin; end)</code>? This will allow us to write 
 and obvious way.</p>
 <p>The implementation is given below:</p>
 <pre class="code cpp literal-block">
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max_element</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">begin</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">end</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">begin</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">end</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
-            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span><span class="w"> </span><span class="n">begin</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">begin</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">begin</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">max</span><span class="p">)</span><span class="w">
+            </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">max</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>Using this implementation one can find the maximum element both in the whole array and in any part of it:</p>
 <pre class="code cpp literal-block">
-<span class="kt">int</span> <span class="n">array</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">array</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">};</span><span class="w">
 
-<span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span> <span class="o">+</span> <span class="mi">6</span><span class="p">);</span>
-<span class="kt">int</span> <span class="n">max_of_first3</span> <span class="o">=</span> <span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">array</span> <span class="o">+</span> <span class="mi">3</span><span class="p">);</span>
+</span><span class="kt">int</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">array</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w">
+</span><span class="kt">int</span><span class="w"> </span><span class="n">max_of_first3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">array</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
 </pre>
 <h2>Can we do even better?</h2>
 <p>Our generalized function works great for arrays of any type, but arrays have a few drawbacks:
@@ -148,19 +148,19 @@ difficults during the process of refactoring.</p>
 <p>To solve this problem we have to decouple the algorithm from a data structure it processes.</p>
 <p>Lets have a look at our function:</p>
 <pre class="code cpp literal-block">
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max_element</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">begin</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">end</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">begin</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">end</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
-            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span><span class="w"> </span><span class="n">begin</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">begin</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">begin</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">max</span><span class="p">)</span><span class="w">
+            </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">max</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>How do we access the array elements?</p>
 <ol class="arabic simple">
@@ -174,19 +174,19 @@ logic of accessing elements of different data structures (e. g. a linked list).<
 <p>It is easy to do using templates and operators overloading facilities of <code>C++</code>.</p>
 <p>So the final version of our function looks like this:</p>
 <pre class="code cpp literal-block">
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">Iterator</span><span class="o">&gt;</span>
-<span class="n">Iterator</span> <span class="n">max_element</span><span class="p">(</span><span class="n">Iterator</span> <span class="n">begin</span><span class="p">,</span> <span class="n">Iterator</span> <span class="n">end</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">Iterator</span> <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">Iterator</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">Iterator</span><span class="w"> </span><span class="n">max_element</span><span class="p">(</span><span class="n">Iterator</span><span class="w"> </span><span class="n">begin</span><span class="p">,</span><span class="w"> </span><span class="n">Iterator</span><span class="w"> </span><span class="n">end</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">Iterator</span><span class="w"> </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
 
-    <span class="k">for</span> <span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span> <span class="n">begin</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">begin</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">begin</span> <span class="o">&gt;</span> <span class="o">*</span> <span class="n">max</span><span class="p">)</span>
-            <span class="n">max</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
-    <span class="p">}</span>
+    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">begin</span><span class="p">;</span><span class="w"> </span><span class="n">begin</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">begin</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">begin</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">max</span><span class="p">)</span><span class="w">
+            </span><span class="n">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 
-    <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
-<span class="p">}</span>
+    </span><span class="k">return</span><span class="w"> </span><span class="n">max</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>So here we use objects of template parameter class <code>Iterator</code> instead of pointers. So what's an
 iterator?</p>
@@ -203,115 +203,115 @@ the same algorithm for different data structures without any changes of the code
 <pre class="code cpp literal-block">
 <span class="cp">#ifndef __LIST_NODE_H__
 #define __LIST_NODE_H__
-</span>
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="n">Node</span>
-<span class="p">{</span>
-    <span class="n">T</span> <span class="n">data</span><span class="p">;</span>
-    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">next</span><span class="p">;</span>
-<span class="p">};</span>
+</span><span class="w">
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">struct</span><span class="w"> </span><span class="nc">Node</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">T</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w">
+    </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w">
+</span><span class="p">};</span><span class="w">
 
-<span class="cp">#endif </span><span class="cm">/* __LIST_NODE_H__ */</span>
+</span><span class="cp">#endif </span><span class="cm">/* __LIST_NODE_H__ */</span>
 </pre>
 <p>The implementation of a list container:</p>
 <pre class="code cpp literal-block">
 <span class="cp">#ifndef __LINKED_LIST_H__
 #define __LINKED_LIST_H__
-</span>
-<span class="cp">#include</span> <span class="cpf">&quot;list_node.h&quot;</span><span class="cp">
-#include</span> <span class="cpf">&quot;list_iterator.h&quot;</span><span class="cp">
-</span>
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">class</span> <span class="nc">LinkedList</span>
-<span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">LinkedList</span><span class="p">();</span>
-    <span class="o">~</span><span class="n">LinkedList</span><span class="p">();</span>
+</span><span class="w">
+</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;list_node.h&quot;</span><span class="cp">
+#include</span><span class="w"> </span><span class="cpf">&quot;list_iterator.h&quot;</span><span class="cp">
+</span><span class="w">
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">LinkedList</span><span class="w">
+</span><span class="p">{</span><span class="w">
+</span><span class="k">public</span><span class="o">:</span><span class="w">
+    </span><span class="n">LinkedList</span><span class="p">();</span><span class="w">
+    </span><span class="o">~</span><span class="n">LinkedList</span><span class="p">();</span><span class="w">
 
-    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">begin</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
-    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">end</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">begin</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">
+    </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">end</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">
 
-    <span class="kt">void</span> <span class="nf">push_front</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">);</span>
-    <span class="kt">void</span> <span class="nf">push_back</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">);</span>
+    </span><span class="kt">void</span><span class="w"> </span><span class="nf">push_front</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">elem</span><span class="p">);</span><span class="w">
+    </span><span class="kt">void</span><span class="w"> </span><span class="nf">push_back</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">elem</span><span class="p">);</span><span class="w">
 
-<span class="k">private</span><span class="o">:</span>
-    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_head</span><span class="p">;</span>
-    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_tail</span><span class="p">;</span>
-<span class="p">};</span>
+</span><span class="k">private</span><span class="o">:</span><span class="w">
+    </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">_head</span><span class="p">;</span><span class="w">
+    </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">_tail</span><span class="p">;</span><span class="w">
+</span><span class="p">};</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">LinkedList</span><span class="p">()</span>
-    <span class="o">:</span> <span class="n">_head</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">_tail</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="p">{</span> <span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">LinkedList</span><span class="p">()</span><span class="w">
+    </span><span class="o">:</span><span class="w"> </span><span class="n">_head</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">_tail</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::~</span><span class="n">LinkedList</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">_head</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">next</span> <span class="o">=</span> <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-        <span class="k">delete</span> <span class="n">_head</span><span class="p">;</span>
-        <span class="n">_head</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::~</span><span class="n">LinkedList</span><span class="p">()</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">_head</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span><span class="w">
+        </span><span class="k">delete</span><span class="w"> </span><span class="n">_head</span><span class="p">;</span><span class="w">
+        </span><span class="n">_head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="kt">void</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_front</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_head</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">_head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
-        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
-        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="kt">void</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_front</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">elem</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">_head</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">_head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+        </span><span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem</span><span class="p">;</span><span class="w">
+        </span><span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
 
-        <span class="n">_tail</span> <span class="o">=</span> <span class="n">_head</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">oldfirst</span> <span class="o">=</span> <span class="n">_head</span><span class="p">;</span>
+        </span><span class="n">_tail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_head</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">oldfirst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_head</span><span class="p">;</span><span class="w">
 
-        <span class="n">_head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
-        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
-        <span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">oldfirst</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+        </span><span class="n">_head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+        </span><span class="n">_head</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem</span><span class="p">;</span><span class="w">
+        </span><span class="n">_head</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oldfirst</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="kt">void</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_back</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">elem</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">_tail</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">_tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
-        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
-        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="kt">void</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">push_back</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">elem</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">_tail</span><span class="p">)</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">_tail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+        </span><span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem</span><span class="p">;</span><span class="w">
+        </span><span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
 
-        <span class="n">_head</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">oldlast</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
+        </span><span class="n">_head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_tail</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="k">else</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">oldlast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_tail</span><span class="p">;</span><span class="w">
 
-        <span class="n">_tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span>
-        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">elem</span><span class="p">;</span>
-        <span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        </span><span class="n">_tail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">;</span><span class="w">
+        </span><span class="n">_tail</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">elem</span><span class="p">;</span><span class="w">
+        </span><span class="n">_tail</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
 
-        <span class="n">oldlast</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">_tail</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+        </span><span class="n">oldlast</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_tail</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">begin</span><span class="p">()</span> <span class="k">const</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_head</span><span class="p">);</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">begin</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_head</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">end</span><span class="p">()</span> <span class="k">const</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">end</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="cp">#endif </span><span class="cm">/* __LINKED_LIST_H__ */</span>
+</span><span class="cp">#endif </span><span class="cm">/* __LINKED_LIST_H__ */</span>
 </pre>
 <p>We have implemented a minimal subset of list methods:</p>
 <ul class="simple">
@@ -325,72 +325,72 @@ The implementation of an iterator for a linked list data structure is given belo
 <pre class="code cpp literal-block">
 <span class="cp">#ifndef __LIST_ITERATOR_H__
 #define __LIST_ITERATOR_H__
-</span>
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">class</span> <span class="nc">ListIterator</span>
-<span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">);</span>
+</span><span class="w">
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">class</span><span class="w"> </span><span class="nc">ListIterator</span><span class="w">
+</span><span class="p">{</span><span class="w">
+</span><span class="k">public</span><span class="o">:</span><span class="w">
+    </span><span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">node</span><span class="p">);</span><span class="w">
 
-    <span class="k">const</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+    </span><span class="k">const</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">node</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">
 
-    <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="k">operator</span><span class="o">++</span><span class="p">();</span>
-    <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
-    <span class="kt">bool</span> <span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">it</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+    </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="k">operator</span><span class="o">++</span><span class="p">();</span><span class="w">
+    </span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="k">operator</span><span class="o">*</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">
+    </span><span class="kt">bool</span><span class="w"> </span><span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">it</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w">
 
-<span class="k">private</span><span class="o">:</span>
-    <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">_currentNode</span><span class="p">;</span>
-<span class="p">};</span>
+</span><span class="k">private</span><span class="o">:</span><span class="w">
+    </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">_currentNode</span><span class="p">;</span><span class="w">
+</span><span class="p">};</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">node</span><span class="p">)</span>
-    <span class="o">:</span> <span class="n">_currentNode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-<span class="p">{</span> <span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">ListIterator</span><span class="p">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">node</span><span class="p">)</span><span class="w">
+    </span><span class="o">:</span><span class="w"> </span><span class="n">_currentNode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="w">
+</span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">const</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">node</span><span class="p">()</span> <span class="k">const</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">_currentNode</span><span class="p">;</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">const</span><span class="w"> </span><span class="n">Node</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">node</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">_currentNode</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">++</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">_currentNode</span> <span class="o">=</span> <span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-    <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">++</span><span class="p">()</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="n">_currentNode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="k">const</span><span class="w"> </span><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">_currentNode</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="kt">bool</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span> <span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">it</span><span class="p">)</span> <span class="k">const</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">_currentNode</span> <span class="o">!=</span> <span class="n">it</span><span class="p">.</span><span class="n">node</span><span class="p">();</span>
-<span class="p">}</span>
+</span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">
+</span><span class="kt">bool</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">!=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ListIterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">it</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">_currentNode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="n">node</span><span class="p">();</span><span class="w">
+</span><span class="p">}</span><span class="w">
 
-<span class="cp">#endif </span><span class="cm">/* __LIST_ITERATOR_H__ */</span>
+</span><span class="cp">#endif </span><span class="cm">/* __LIST_ITERATOR_H__ */</span>
 </pre>
 <p>An iterator instance is initialized with a pointer to a linked list node. Overloaded operators implement
 the logic of accessing list nodes and values they contain.</p>
 <p>Lets have a look at how our function for returning of an iterator which points to the maximum element of
 a given data structure works for both arrays and linked lists:</p>
 <pre class="code cpp literal-block">
-<span class="n">LinkedList</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">l</span><span class="p">;</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="p">;</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span><span class="w">
+</span><span class="n">l</span><span class="p">.</span><span class="n">push_front</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w">
 
-<span class="kt">int</span> <span class="n">arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+</span><span class="kt">int</span><span class="w"> </span><span class="n">arr</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span><span class="w">
 
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Max in list: &quot;</span>  <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">l</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">l</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Max in array: &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr</span> <span class="o">+</span> <span class="mi">6</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
+</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Max in list: &quot;</span><span class="w">  </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">l</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="n">end</span><span class="p">())</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span><span class="w">
+</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Max in array: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">max_element</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span>
 </pre>
 <h2>Conclusion</h2>
 <p>This is only a small part of what you need to know about iterators. We've covered only one kind of iterators

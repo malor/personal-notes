@@ -57,50 +57,50 @@ JSON-blob. I was sure that it was a problem in our code.  To my surprise the pro
 the bottleneck was in this function of <a class="reference external" href="https://github.com/Yelp/python-gearman/">python-gearman</a>
 client library:</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">read_data_from_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_to_read</span><span class="o">=</span><span class="mi">4096</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Reads data from socket --&gt; buffer&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">read_data_from_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_to_read</span><span class="o">=</span><span class="mi">4096</span><span class="p">):</span><span class="w">
+    </span><span class="sd">&quot;&quot;&quot;Reads data from socket --&gt; buffer&quot;&quot;&quot;</span><span class="w">
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'disconnected'</span><span class="p">)</span>
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span><span class="w">
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'disconnected'</span><span class="p">)</span><span class="w">
 
-    <span class="n">recv_buffer</span> <span class="o">=</span> <span class="s1">''</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">recv_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gearman_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bytes_to_read</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket_exception</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">socket_exception</span><span class="p">)</span>
+</span>    <span class="n">recv_buffer</span> <span class="o">=</span> <span class="s1">''</span><span class="w">
+</span>    <span class="k">try</span><span class="p">:</span><span class="w">
+</span>        <span class="n">recv_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gearman_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">bytes_to_read</span><span class="p">)</span><span class="w">
+</span>    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">socket_exception</span><span class="p">:</span><span class="w">
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">socket_exception</span><span class="p">)</span><span class="w">
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'remote disconnected'</span><span class="p">)</span>
+</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span><span class="w">
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">throw_exception</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">'remote disconnected'</span><span class="p">)</span><span class="w">
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span> <span class="o">+=</span> <span class="n">recv_buffer</span>
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span><span class="p">)</span>
+</span>    <span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span> <span class="o">+=</span> <span class="n">recv_buffer</span><span class="w">
+</span>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_incoming_buffer</span><span class="p">)</span>
 </pre>
 <p>The problem is in the line: <code>self._incoming_buffer += recv_buffer</code> where the <code>_incoming_buffer</code>
 instance variable has the type <code>str</code>. I was always taught that it is a bad idea to do a massive
 string concatenation in a programming language where strings are considered to be immutable. So I
 wrote a small snippet to find out how slow it really was:</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-    <span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span>
-    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">():</span><span class="w">
+</span>    <span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span><span class="w">
+</span>    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span><span class="w">
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-        <span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span><span class="w">
+</span>        <span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
 </pre>
 <p>The <code>timeit.timeit()</code> function showed that it took less than <strong>1 ms</strong> to call the function <code>f()</code>
 that did 1000 string concatenation operations though. That was really amazing. I started to think
 that I was missing something. So I tried to run the following snippet:</p>
 <pre class="code python literal-block">
-<span class="k">def</span> <span class="nf">g</span><span class="p">():</span>
-    <span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span>
+<span class="k">def</span> <span class="nf">g</span><span class="p">():</span><span class="w">
+</span>    <span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span><span class="w">
+</span>        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">spam</span> <span class="o">=</span> <span class="s1">''</span><span class="w">
 
-    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span>
+</span>    <span class="n">eggs</span> <span class="o">=</span> <span class="s1">'a'</span> <span class="o">*</span> <span class="mi">4096</span><span class="w">
 
-    <span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
+</span>    <span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span><span class="w">
+</span>        <span class="n">f</span><span class="o">.</span><span class="n">spam</span> <span class="o">+=</span> <span class="n">eggs</span>
 </pre>
 <p>It took about 450 ms - that's much &quot;better&quot; (or probably closer to my expectations)!
 So what the heck? These two functions look very similar except that the latter uses an instance
@@ -119,29 +119,29 @@ function. The time came to debug the interpreter using <code>gdb</code>. The deb
 the <code>CPython</code> function that did string concatenation.</p>
 <p>The source code of <code>string_concatenate()</code> function had a few interesting lines:</p>
 <pre class="code c literal-block">
- <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">ob_refcnt</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">PyString_CHECK_INTERNED</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="p">{</span>
-    <span class="cm">/* Now we own the last reference to 'v', so we can resize it
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">ob_refcnt</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">PyString_CHECK_INTERNED</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="cm">/* Now we own the last reference to 'v', so we can resize it
      * in-place.
-     */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">_PyString_Resize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">new_len</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="cm">/* XXX if _PyString_Resize() fails, 'v' has been
+     */</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_PyString_Resize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">new_len</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="cm">/* XXX if _PyString_Resize() fails, 'v' has been
          * deallocated so it cannot be put back into
          * 'variable'.  The MemoryError is raised when there
          * is no value in 'variable', which might (very
          * remotely) be a cause of incompatibilities.
-         */</span>
-        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="cm">/* copy 'w' into the newly allocated area of 'v' */</span>
-    <span class="n">memcpy</span><span class="p">(</span><span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">v_len</span><span class="p">,</span>
-           <span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="n">w_len</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">else</span> <span class="p">{</span>
-    <span class="cm">/* When in-place resizing is not an option. */</span>
-    <span class="n">PyString_Concat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
-<span class="p">}</span>
+         */</span><span class="w">
+        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+    </span><span class="cm">/* copy 'w' into the newly allocated area of 'v' */</span><span class="w">
+    </span><span class="n">memcpy</span><span class="p">(</span><span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v_len</span><span class="p">,</span><span class="w">
+           </span><span class="n">PyString_AS_STRING</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="w"> </span><span class="n">w_len</span><span class="p">);</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">v</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="cm">/* When in-place resizing is not an option. */</span><span class="w">
+    </span><span class="n">PyString_Concat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">);</span><span class="w">
+    </span><span class="k">return</span><span class="w"> </span><span class="n">v</span><span class="p">;</span><span class="w">
+</span><span class="p">}</span>
 </pre>
 <p>So-so, strings actually <strong>can</strong> be mutable! This allows to resize ones in-place that makes strings
 concatenation very fast. But there is a strict constraint - there must be <strong>at most</strong> 1 reference

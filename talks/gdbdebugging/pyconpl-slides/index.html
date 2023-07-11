@@ -174,12 +174,11 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>ptrace: the secret power behind gdb and strace</h2>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;sys/ptrace.h&gt;</span><span class="cp"></span>
+<div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/ptrace.h&gt;</span>
 
-<span class="kt">long</span> <span class="nf">ptrace</span><span class="p">(</span><span class="k">enum</span> <span class="n">__ptrace_request</span> <span class="n">request</span><span class="p">,</span> <span class="kt">pid_t</span> <span class="n">pid</span><span class="p">,</span>
-            <span class="kt">void</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">);</span>
-</pre></div>
-
+<span class="kt">long</span><span class="w"> </span><span class="nf">ptrace</span><span class="p">(</span><span class="k">enum</span><span class="w"> </span><span class="n">__ptrace_request</span><span class="w"> </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="p">,</span>
+<span class="w">            </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">);</span>
+</code></pre></div>
 
 <p>provides a means by which one process (the "tracer") may observe and control the execution of another process (the "tracee")</p>
 <hr />
@@ -194,57 +193,54 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>Debugging of interpreted languages: interpreter level traceback</h2>
-<div class="codehilite"><pre><span></span>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
+<div class="codehilite"><pre><span></span><code>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
 #1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
 #2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
 #3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
 #4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
 #5  call_function () at ../Python/ceval.c:4041
 #6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h2>Debugging of interpreted languages: application level traceback</h2>
-<div class="codehilite"><pre><span></span>/usr/local/lib/python2.7/dist-packages/eventlet/greenpool.py:82 in _spawn_n_impl
-    `func(*args, **kwargs)`
-/opt/stack/neutron/neutron/agent/l3/agent.py:461 in _process_router_update
-    `for rp, update in self._queue.each_update_to_next_router():`
-/opt/stack/neutron/neutron/agent/l3/router_processing_queue.py:154 in each_update_to_next_router
-    `next_update = self._queue.get()`
-/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:313 in get
-    `return waiter.wait()`
-/usr/local/lib/python2.7/dist-packages/eventlet/queue.py:141 in wait
-   `return get_hub().switch()`
-/usr/local/lib/python2.7/dist-packages/eventlet/hubs/hub.py:294 in switch
-    `return self.greenlet.switch()`
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">greenpool</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">82</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_spawn_n_impl</span>
+<span class="w">    </span><span class="err">`</span><span class="nx">func</span><span class="p">(</span><span class="o">*</span><span class="nx">args</span><span class="p">,</span><span class="w"> </span><span class="o">**</span><span class="nx">kwargs</span><span class="p">)</span><span class="err">`</span>
+<span class="o">/</span><span class="nx">opt</span><span class="o">/</span><span class="nx">stack</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">agent</span><span class="o">/</span><span class="nx">l3</span><span class="o">/</span><span class="nx">agent</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">461</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">_process_router_update</span>
+<span class="w">    </span><span class="err">`</span><span class="k">for</span><span class="w"> </span><span class="nx">rp</span><span class="p">,</span><span class="w"> </span><span class="nx">update</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">_queue</span><span class="p">.</span><span class="nx">each_update_to_next_router</span><span class="p">():</span><span class="err">`</span>
+<span class="o">/</span><span class="nx">opt</span><span class="o">/</span><span class="nx">stack</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">neutron</span><span class="o">/</span><span class="nx">agent</span><span class="o">/</span><span class="nx">l3</span><span class="o">/</span><span class="nx">router_processing_queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">154</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">each_update_to_next_router</span>
+<span class="w">    </span><span class="err">`</span><span class="nx">next_update</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">_queue</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span><span class="err">`</span>
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">313</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">get</span>
+<span class="w">    </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="nx">waiter</span><span class="p">.</span><span class="nx">wait</span><span class="p">()</span><span class="err">`</span>
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">queue</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">141</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">wait</span>
+<span class="w">   </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="nx">get_hub</span><span class="p">().</span><span class="nx">switch</span><span class="p">()</span><span class="err">`</span>
+<span class="o">/</span><span class="nx">usr</span><span class="o">/</span><span class="nx">local</span><span class="o">/</span><span class="nx">lib</span><span class="o">/</span><span class="nx">python2</span><span class="m m-Double">.7</span><span class="o">/</span><span class="nx">dist</span><span class="o">-</span><span class="nx">packages</span><span class="o">/</span><span class="nx">eventlet</span><span class="o">/</span><span class="nx">hubs</span><span class="o">/</span><span class="nx">hub</span><span class="p">.</span><span class="nx">py</span><span class="p">:</span><span class="mi">294</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">switch</span>
+<span class="w">    </span><span class="err">`</span><span class="k">return</span><span class="w"> </span><span class="kp">self</span><span class="p">.</span><span class="nx">greenlet</span><span class="p">.</span><span class="nx">switch</span><span class="p">()</span><span class="err">`</span>
+</code></pre></div>
 
 <hr />
 <h2>PyEval_EvalFrameEx</h2>
-<div class="codehilite"><pre><span></span><span class="n">PyEval_EvalFrameEx</span><span class="p">(</span><span class="n">PyFrameObject</span> <span class="o">*</span><span class="n">f</span><span class="p">,</span> <span class="kt">int</span> <span class="n">throwflag</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="n">PyEval_EvalFrameEx</span><span class="p">(</span><span class="n">PyFrameObject</span><span class="w"> </span><span class="o">*</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">throwflag</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="cm">/* variable declaration and initialization stuff */</span>
-    <span class="k">for</span> <span class="p">(;;)</span> <span class="p">{</span>
-        <span class="cm">/* do periodic housekeeping once in a few opcodes */</span>
-        <span class="n">opcode</span> <span class="o">=</span> <span class="n">NEXTOP</span><span class="p">();</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">HAS_ARG</span><span class="p">(</span><span class="n">opcode</span><span class="p">))</span> <span class="n">oparg</span> <span class="o">=</span> <span class="n">NEXTARG</span><span class="p">();</span>
-        <span class="k">switch</span> <span class="p">(</span><span class="n">opcode</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">case</span> <span class="nl">NOP</span><span class="p">:</span>
-                <span class="k">goto</span> <span class="n">fast_next_opcode</span><span class="p">;</span>
-            <span class="cm">/* lots of more complex opcode implementations */</span>
-            <span class="k">default</span><span class="o">:</span>
-                <span class="cm">/* become rather unhappy */</span>
-        <span class="p">}</span>
-        <span class="cm">/* handle exceptions or runtime errors, if any */</span>
-    <span class="p">}</span>
-    <span class="cm">/* we are finished, pop the frame stack */</span>
-    <span class="n">tstate</span><span class="o">-&gt;</span><span class="n">frame</span> <span class="o">=</span> <span class="n">f</span><span class="o">-&gt;</span><span class="n">f_back</span><span class="p">;</span>
-    <span class="k">return</span> <span class="n">retval</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/* variable declaration and initialization stuff */</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="cm">/* do periodic housekeeping once in a few opcodes */</span>
+<span class="w">        </span><span class="n">opcode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NEXTOP</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HAS_ARG</span><span class="p">(</span><span class="n">opcode</span><span class="p">))</span><span class="w"> </span><span class="n">oparg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NEXTARG</span><span class="p">();</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">opcode</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="no">NOP</span><span class="p">:</span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">fast_next_opcode</span><span class="p">;</span>
+<span class="w">            </span><span class="cm">/* lots of more complex opcode implementations */</span>
+<span class="w">            </span><span class="k">default</span><span class="o">:</span>
+<span class="w">                </span><span class="cm">/* become rather unhappy */</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="cm">/* handle exceptions or runtime errors, if any */</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="cm">/* we are finished, pop the frame stack */</span>
+<span class="w">    </span><span class="n">tstate</span><span class="o">-&gt;</span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="o">-&gt;</span><span class="n">f_back</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">retval</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><a href="https://tech.blog.aknin.name/category/my-projects/pythons-innards/">blog post</a> on CPython internals</p>
 <hr />
@@ -259,19 +255,16 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>Prerequisites: gdb with Python support</h2>
-<div class="codehilite"><pre><span></span>apt-get install gdb
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>apt-get<span class="w"> </span>install<span class="w"> </span>gdb
+</code></pre></div>
 
 <p>or</p>
-<div class="codehilite"><pre><span></span>yum install gdb
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>yum<span class="w"> </span>install<span class="w"> </span>gdb
+</code></pre></div>
 
 <p>or something else depending on the distro you use, then</p>
-<div class="codehilite"><pre><span></span>gdb -ex <span class="s1">&#39;python print(&quot;ok&quot;)&#39;</span> -ex quit <span class="p">|</span> tail -n <span class="m">1</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb<span class="w"> </span>-ex<span class="w"> </span><span class="s1">&#39;python print(&quot;ok&quot;)&#39;</span><span class="w"> </span>-ex<span class="w"> </span>quit<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
 
 <hr />
 <h2>Prerequisites: CPython debugging symbols</h2>
@@ -282,19 +275,16 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>Prerequisites: CPython debugging symbols</h2>
-<div class="codehilite"><pre><span></span> apt-get install python-dbg
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>python-dbg
+</code></pre></div>
 
 <p>or</p>
-<div class="codehilite"><pre><span></span> yum install python-debuginfo
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>python-debuginfo
+</code></pre></div>
 
 <p>CentOS/RHEL put those into a separate <a href="http://debuginfo.centos.org/">repo</a></p>
-<div class="codehilite"><pre><span></span> debuginfo-install python
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="w"> </span>debuginfo-install<span class="w"> </span>python
+</code></pre></div>
 
 <p>Some distros (like Arch Linux) do not ship debugging symbols at all</p>
 <hr />
@@ -310,39 +300,34 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>Debug a process from the start</h2>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python
+<div class="codehilite"><pre><span></span><code>gdb<span class="w"> </span>/usr/bin/python
 
-<span class="o">(</span>gdb<span class="o">)</span> run my_python_script.py
-</pre></div>
-
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>run<span class="w"> </span>my_python_script.py
+</code></pre></div>
 
 <hr />
 <h2>Attach to a running process</h2>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python -p <span class="nv">$PID</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb<span class="w"> </span>/usr/bin/python<span class="w"> </span>-p<span class="w"> </span><span class="nv">$PID</span>
+</code></pre></div>
 
 <p>or simply</p>
-<div class="codehilite"><pre><span></span>gdb -p $PID
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb -p $PID
+</code></pre></div>
 
 <p>(note: gdb will stop <strong>all</strong> process threads)</p>
 <hr />
 <h2>Load the inferior state from a core dump</h2>
 <p>get a core dump of a running process</p>
-<div class="codehilite"><pre><span></span>gcore <span class="nv">$PID</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gcore<span class="w"> </span><span class="nv">$PID</span>
+</code></pre></div>
 
 <p>open it in gdb</p>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python core.<span class="nv">$PID</span>
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb<span class="w"> </span>/usr/bin/python<span class="w"> </span>core.<span class="nv">$PID</span>
+</code></pre></div>
 
 <hr />
 <h2>Print a traceback</h2>
-<div class="codehilite"><pre><span></span>(gdb) py-bt
+<div class="codehilite"><pre><span></span><code>(gdb) py-bt
 Traceback (most recent call first):
 
 File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 872, in emit
@@ -361,77 +346,71 @@ File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1440, in debug
   self.logger.debug(msg, *args, **kwargs)
 File &quot;/opt/stack/nova/nova/compute/resource_tracker.py&quot;, line 639, in _report_hypervisor_resource_view
   &#39;pci_devices&#39;: pci_devices})
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h2>Print Python code</h2>
-<div class="codehilite"><pre><span></span>(gdb) py-list
- 867 try:
- 868     if (isinstance(msg, unicode) and
- 869         getattr(stream, &#39;encoding&#39;, None)):
- 870         ufs = u&#39;%s\n&#39;
- 871         try:
-&gt;872             stream.write(ufs % msg)
- 873         except UnicodeEncodeError:
- 874             #Printing to terminals sometimes fails. For example,
- 875             #with an encoding of &#39;cp1251&#39;, the above write will
- 876             #work if written to a stream opened or wrapped by
- 877             #the codecs module, but fail when writing to a
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="ss">(</span><span class="nv">gdb</span><span class="ss">)</span><span class="w"> </span><span class="nv">py</span><span class="o">-</span><span class="nv">list</span>
+<span class="w"> </span><span class="mi">867</span><span class="w"> </span><span class="nv">try</span>:
+<span class="w"> </span><span class="mi">868</span><span class="w">     </span><span class="k">if</span><span class="w"> </span><span class="ss">(</span><span class="nv">isinstance</span><span class="ss">(</span><span class="nv">msg</span>,<span class="w"> </span><span class="nv">unicode</span><span class="ss">)</span><span class="w"> </span><span class="nv">and</span>
+<span class="w"> </span><span class="mi">869</span><span class="w">         </span><span class="nv">getattr</span><span class="ss">(</span><span class="nv">stream</span>,<span class="w"> </span><span class="s1">&#39;encoding&#39;</span>,<span class="w"> </span><span class="nv">None</span><span class="ss">))</span>:
+<span class="w"> </span><span class="mi">870</span><span class="w">         </span><span class="nv">ufs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">u</span><span class="s1">&#39;%s\n&#39;</span>
+<span class="w"> </span><span class="mi">871</span><span class="w">         </span><span class="nv">try</span>:
+<span class="o">&gt;</span><span class="mi">872</span><span class="w">             </span><span class="nv">stream</span>.<span class="nv">write</span><span class="ss">(</span><span class="nv">ufs</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="nv">msg</span><span class="ss">)</span>
+<span class="w"> </span><span class="mi">873</span><span class="w">         </span><span class="nv">except</span><span class="w"> </span><span class="nv">UnicodeEncodeError</span>:
+<span class="w"> </span><span class="mi">874</span><span class="w">             </span>#<span class="nv">Printing</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">terminals</span><span class="w"> </span><span class="nv">sometimes</span><span class="w"> </span><span class="nv">fails</span>.<span class="w"> </span><span class="k">For</span><span class="w"> </span><span class="nv">example</span>,
+<span class="w"> </span><span class="mi">875</span><span class="w">             </span>#<span class="nv">with</span><span class="w"> </span><span class="nv">an</span><span class="w"> </span><span class="nv">encoding</span><span class="w"> </span><span class="nv">of</span><span class="w"> </span><span class="s1">&#39;cp1251&#39;</span>,<span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">above</span><span class="w"> </span><span class="nv">write</span><span class="w"> </span><span class="nv">will</span>
+<span class="w"> </span><span class="mi">876</span><span class="w">             </span>#<span class="nv">work</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">written</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="nv">stream</span><span class="w"> </span><span class="nv">opened</span><span class="w"> </span><span class="nv">or</span><span class="w"> </span><span class="nv">wrapped</span><span class="w"> </span><span class="nv">by</span>
+<span class="w"> </span><span class="mi">877</span><span class="w">             </span>#<span class="nv">the</span><span class="w"> </span><span class="nv">codecs</span><span class="w"> </span><span class="nv">module</span>,<span class="w"> </span><span class="nv">but</span><span class="w"> </span><span class="nv">fail</span><span class="w"> </span><span class="nv">when</span><span class="w"> </span><span class="nv">writing</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">a</span>
+</code></pre></div>
 
 <hr />
 <h2>Print local variables</h2>
-<div class="codehilite"><pre><span></span>(gdb) py-locals
+<div class="codehilite"><pre><span></span><code>(gdb) py-locals
 self = &lt;ColorHandler(...)&gt;
 stream = &lt;file at remote 0x7fa76ebb61e0&gt;
 fs = &#39;%s\n&#39;
 ufs = u&#39;%s\n&#39;
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h2>Set a breakpoint in native code</h2>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python
+<div class="codehilite"><pre><span></span><code><span class="n">gdb</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">python</span>
 
-(gdb) break mkdir
-Breakpoint 1 at 0x417600
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="w"> </span><span class="n">mkdir</span>
+<span class="n">Breakpoint</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="mh">0x417600</span>
 
-(gdb) condition 1 $_regex((char*) $rdi, &quot;.*/instances/.*&quot;)
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">condition</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">$</span><span class="n">_regex</span><span class="p">((</span><span class="nb">char</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">$</span><span class="n">rdi</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;.*/instances/.*&quot;</span><span class="p">)</span>
 
-(gdb) commands 1
-Type commands for breakpoint(s) 1, one per line.
-End with a line saying just &quot;end&quot;.
-&gt;py-bt
-&gt;end
-end
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">commands</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">Type</span><span class="w"> </span><span class="n">commands</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">breakpoint</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">per</span><span class="w"> </span><span class="n">line</span><span class="o">.</span>
+<span class="n">End</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="n">saying</span><span class="w"> </span><span class="n">just</span><span class="w"> </span><span class="s2">&quot;end&quot;</span><span class="o">.</span>
+<span class="o">&gt;</span><span class="n">py</span><span class="o">-</span><span class="n">bt</span>
+<span class="o">&gt;</span><span class="n">end</span>
+<span class="n">end</span>
 
-(gdb) run -m testtools.run discover -s nova/tests/unit
-</pre></div>
-
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">-</span><span class="n">m</span><span class="w"> </span><span class="n">testtools</span><span class="o">.</span><span class="n">run</span><span class="w"> </span><span class="n">discover</span><span class="w"> </span><span class="o">-</span><span class="n">s</span><span class="w"> </span><span class="n">nova</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span><span class="n">unit</span>
+</code></pre></div>
 
 <hr />
 <h2>Execute arbitrary Python code in the process context</h2>
-<div class="codehilite"><pre><span></span>(gdb) call PyGILState_Ensure()
-$1 = 1
-(gdb) call PyRun_SimpleString(&quot;1 + 1&quot;)
-$2 = 0
-(gdb) call PyGILState_Release(1)
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">call</span><span class="w"> </span><span class="nx">PyGILState_Ensure</span><span class="p">()</span>
+<span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">call</span><span class="w"> </span><span class="nx">PyRun_SimpleString</span><span class="p">(</span><span class="s">&quot;1 + 1&quot;</span><span class="p">)</span>
+<span class="err">$</span><span class="mi">2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="p">(</span><span class="nx">gdb</span><span class="p">)</span><span class="w"> </span><span class="nx">call</span><span class="w"> </span><span class="nx">PyGILState_Release</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 
 <hr />
 <h2>Gotchas: virtual environments and custom CPython builds</h2>
 <ul>
 <li>when attaching to a Python process started in a virtual environment debugging symbols <em>may</em> suddenly not be found anymore</li>
 </ul>
-<div class="codehilite"><pre><span></span>gdb -p $2975
+<div class="codehilite"><pre><span></span><code>gdb -p $2975
 Attaching to process 2975
 Reading symbols from .../venv/bin/python2...
 (no debugging symbols found)...done.
-</pre></div>
-
+</code></pre></div>
 
 <ul>
 <li>it happens because gdb looks for them in the <em>wrong place</em>: if you omit the <em>inferior</em> binary path, gdb tries to derive it from <code>/proc/$PID/exe</code> symlink and then load debugging symbols stored in the predefined path - e.g. <code>/usr/lib/debug/$PATH</code>. For a virtual environment it's not <code>/usr/lib/debug/usr/bin/python2</code>, thus, loading fails</li>
@@ -441,53 +420,47 @@ Reading symbols from .../venv/bin/python2...
 <ul>
 <li>the solution is to <em>always</em> pass the inferior binary path explicitly when attaching to a process</li>
 </ul>
-<div class="codehilite"><pre><span></span>gdb /usr/bin/python2.7 -p $PID 
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>gdb /usr/bin/python2.7 -p $PID 
+</code></pre></div>
 
 <ul>
 <li>alternatively, modern CPython builds (at least on Debian Testing or Ubuntu Xenial) have an associated <code>build-id</code> value, that is used to uniquely identify stripped debugging symbols</li>
 </ul>
-<div class="codehilite"><pre><span></span>objdump -s -j .note.gnu.build-id /usr/bin/python2.7
-</pre></div>
+<div class="codehilite"><pre><span></span><code>objdump -s -j .note.gnu.build-id /usr/bin/python2.7
+</code></pre></div>
 
-
-<div class="codehilite"><pre><span></span>Reading symbols from /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code>Reading symbols from /usr/lib/debug/.build-id/8d/04a3ae38521cb7c7928e4a7c8b1ed385e763e4.debug...done.
+</code></pre></div>
 
 <hr />
 <h2>Gotchas: virtual environments and custom CPython builds</h2>
 <ul>
 <li>py- commands may be undefined for a very similar reason </li>
 </ul>
-<div class="codehilite"><pre><span></span>(gdb) py-bt
+<div class="codehilite"><pre><span></span><code>(gdb) py-bt
 Undefined command: &quot;py-bt&quot;.  Try &quot;help&quot;.
-</pre></div>
-
+</code></pre></div>
 
 <ul>
 <li>gdb <em>autoloads</em> debugging scripts from <code>$PATH-gdb.py</code> </li>
 </ul>
-<div class="codehilite"><pre><span></span>(gdb) info auto-load
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span>
 
-gdb-scripts:  No auto-load scripts.
-libthread-db:  No auto-loaded libthread-db.
-local-gdbinit:  Local .gdbinit file was not found.
-python-scripts:
-Loaded  Script
-Yes     /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
-</pre></div>
-
+<span class="n">gdb</span><span class="o">-</span><span class="n">scripts</span><span class="p">:</span><span class="w">  </span><span class="n">No</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="w"> </span><span class="n">scripts</span><span class="o">.</span>
+<span class="n">libthread</span><span class="o">-</span><span class="n">db</span><span class="p">:</span><span class="w">  </span><span class="n">No</span><span class="w"> </span><span class="n">auto</span><span class="o">-</span><span class="n">loaded</span><span class="w"> </span><span class="n">libthread</span><span class="o">-</span><span class="n">db</span><span class="o">.</span>
+<span class="n">local</span><span class="o">-</span><span class="n">gdbinit</span><span class="p">:</span><span class="w">  </span><span class="n">Local</span><span class="w"> </span><span class="o">.</span><span class="n">gdbinit</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">found</span><span class="o">.</span>
+<span class="n">python</span><span class="o">-</span><span class="n">scripts</span><span class="p">:</span>
+<span class="n">Loaded</span><span class="w">  </span><span class="n">Script</span>
+<span class="n">Yes</span><span class="w">     </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">gdb</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
 
 <hr />
 <h2>Gotchas: virtual environments and custom CPython builds</h2>
 <ul>
 <li>you can always load the scripts manually</li>
 </ul>
-<div class="codehilite"><pre><span></span>(gdb) source /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
-</pre></div>
-
+<div class="codehilite"><pre><span></span><code><span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">auto</span><span class="o">-</span><span class="nb">load</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">gdb</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
 
 <ul>
 <li>it's also useful for testing of the new versions of gdb scripts shipped with CPython</li>
@@ -495,33 +468,32 @@ Yes     /usr/share/gdb/auto-load/usr/bin/python2.7-gdb.py
 <hr />
 <h2>Gotchas: PTRACE_ATTACH not permitted</h2>
 <p>Controlled by <code>/proc/sys/kernel/yama/ptrace_scope</code>, possible values are
-<em> <code>0</code> - a process can <code>PTRACE_ATTACH</code> to any other
+* <code>0</code> - a process can <code>PTRACE_ATTACH</code> to any other
     process running under the same uid
-</em> <code>1</code> - only descendants can be traced (default on Ubuntu)
-<em> <code>2</code> - admin-only attach, or through children calling <code>PTRACE_TRACEME</code>
-</em> <code>3</code> - no processes may use ptrace with <code>PTRACE_ATTACH</code> nor via <code>PTRACE_TRACEME</code></p>
+* <code>1</code> - only descendants can be traced (default on Ubuntu)
+* <code>2</code> - admin-only attach, or through children calling <code>PTRACE_TRACEME</code>
+* <code>3</code> - no processes may use ptrace with <code>PTRACE_ATTACH</code> nor via <code>PTRACE_TRACEME</code></p>
 <hr />
 <h2>Gotchas: python-dbg</h2>
 <ul>
 <li>a separate build of CPython (with <code>--with-pydebug</code> passed to <code>./configure</code>) with many run-time checks enabled, thus, <em>much</em> slower</li>
 <li><strong>not</strong> required for using gdb</li>
 </ul>
-<div class="codehilite"><pre><span></span>$ <span class="nb">time</span> python -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
 <span class="m">499999500000</span>
 
-real    0m0.096s
-user    0m0.057s
-sys 0m0.030s
+real<span class="w">    </span>0m0.096s
+user<span class="w">    </span>0m0.057s
+sys<span class="w"> </span>0m0.030s
 
-$ <span class="nb">time</span> python-dbg -c <span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>python-dbg<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;print(sum(range(1, 1000000)))&quot;</span>
 <span class="m">499999500000</span>
-<span class="o">[</span><span class="m">18318</span> refs<span class="o">]</span>
+<span class="o">[</span><span class="m">18318</span><span class="w"> </span>refs<span class="o">]</span>
 
-real    0m0.237s
-user    0m0.197s
-sys 0m0.016s
-</pre></div>
-
+real<span class="w">    </span>0m0.237s
+user<span class="w">    </span>0m0.197s
+sys<span class="w"> </span>0m0.016s
+</code></pre></div>
 
 <hr />
 <h2>Gotchas: compiler build flags</h2>
@@ -534,15 +506,14 @@ sys 0m0.016s
 <ul>
 <li>depending on the <a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html">optimization level</a> used in gcc when building CPython or the concrete compiler version used, it's possible that information on local variables or function arguments will be lost at runtime (e.g. with aggressive optimizations enabled by <code>-O3</code>)</li>
 </ul>
-<div class="codehilite"><pre><span></span>(gdb) py-bt
+<div class="codehilite"><pre><span></span><code>(gdb) py-bt
 Traceback (most recent call first):
   File &quot;test2.py&quot;, line 9, in g
     time.sleep(1000)
   File &quot;test2.py&quot;, line 5, in f
     g()
   (frame information optimized out)
-</pre></div>
-
+</code></pre></div>
 
 <hr />
 <h2>Gotchas: PyPy, Jython, etc</h2>
