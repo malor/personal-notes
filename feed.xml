@@ -2,7 +2,7 @@
   <feed xmlns="http://www.w3.org/2005/Atom" >
     <title>Roman Podoliaka's Blog</title>
 
-    <updated>2023-07-11T20:57:14Z</updated>
+    <updated>2023-07-11T21:04:53Z</updated>
     <id>http://podoliaka.org/</id>
 
     <link href="http://podoliaka.org/feed.xml" rel="self" />
@@ -17,7 +17,7 @@
       <id>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</id>
 
       <published>2016-04-10T00:00:00+00:00</published>
-      <updated>2023-07-11T20:57:01.009593+00:00</updated>
+      <updated>2023-07-11T21:04:39.978709+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -602,7 +602,7 @@ when virtual environments are used.&lt;/p&gt;
       <id>http://podoliaka.org//2016/04/02/back/</id>
 
       <published>2016-04-02T00:00:00+00:00</published>
-      <updated>2023-07-11T20:57:01.009593+00:00</updated>
+      <updated>2023-07-11T21:04:39.978709+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -638,7 +638,7 @@ soon.&lt;/p&gt;
       <id>http://podoliaka.org//2013/02/24/stringconcat-en/</id>
 
       <published>2013-02-24T00:00:00+00:00</published>
-      <updated>2023-07-11T20:57:01.009593+00:00</updated>
+      <updated>2023-07-11T21:04:39.978709+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -762,7 +762,7 @@ task queue in &lt;code&gt;Python&lt;/code&gt; programs might want to check it ou
       <id>http://podoliaka.org//2013/01/20/iterators-en/</id>
 
       <published>2013-01-20T00:00:00+00:00</published>
-      <updated>2023-07-11T20:57:01.009593+00:00</updated>
+      <updated>2023-07-11T21:04:39.978709+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -1132,7 +1132,7 @@ as long as it provides the required kinds of iterators.&lt;/p&gt;
       <id>http://podoliaka.org//2011/08/20/iterators-ru/</id>
 
       <published>2011-08-20T00:00:00+00:00</published>
-      <updated>2023-07-11T20:57:01.009593+00:00</updated>
+      <updated>2023-07-11T21:04:39.978709+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
