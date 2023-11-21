@@ -193,13 +193,13 @@ slides: http://podoliaka.org/talks/</p>
 </ul>
 <hr />
 <h2>Debugging of interpreted languages: interpreter level traceback</h2>
-<div class="codehilite"><pre><span></span><code>#0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
-#1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
-#2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
-#3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
-#4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
-#5  call_function () at ../Python/ceval.c:4041
-#6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+<div class="codehilite"><pre><span></span><code><span class="gh">#</span>0  0x00007fcce9b2faf3 in __epoll_wait_nocancel () at ../sysdeps/unix/syscall-template.S:81
+<span class="gh">#</span>1  0x0000000000435ef8 in pyepoll_poll (self=0x7fccdf54f240, args=&lt;optimized out&gt;, kwds=&lt;optimized out&gt;) at ../Modules/selectmodule.c:1034
+<span class="gh">#</span>2  0x000000000049968d in call_function (oparg=&lt;optimized out&gt;, pp_stack=0x7ffc20d7bfb0) at ../Python/ceval.c:4020
+<span class="gh">#</span>3  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
+<span class="gh">#</span>4  0x0000000000499ef2 in fast_function () at ../Python/ceval.c:4106
+<span class="gh">#</span>5  call_function () at ../Python/ceval.c:4041
+<span class="gh">#</span>6  PyEval_EvalFrameEx () at ../Python/ceval.c:2666
 </code></pre></div>
 
 <hr />
@@ -343,7 +343,7 @@ File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1286, in _log
 File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1155, in debug
   self._log(DEBUG, msg, args, **kwargs)
 File &quot;/usr/lib/python2.7/logging/__init__.py&quot;, line 1440, in debug
-  self.logger.debug(msg, *args, **kwargs)
+  self.logger.debug(msg, <span class="gs">*args, *</span>*kwargs)
 File &quot;/opt/stack/nova/nova/compute/resource_tracker.py&quot;, line 639, in _report_hypervisor_resource_view
   &#39;pci_devices&#39;: pci_devices})
 </code></pre></div>

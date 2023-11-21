@@ -1,0 +1,206 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="/static/pygments.css">
+
+  <link rel="alternate" type="application/atom+xml" href="http://podoliaka.org/feed.xml" title="Roman Podoliaka's Blog">
+
+  <title>The perils of temporary object lifetimes in C++</title>
+
+  <meta name="author" content="Roman Podoliaka">
+  
+
+  
+
+<body>
+
+  <div class="header-wrapper">
+  <header class="header">
+    <img src="/static/logo.svg" alt="Logotype" class="logo">
+    <a href="/" class="title">Roman Podoliaka's Blog</a>
+
+    <nav>
+      <a href="/about">about</a><a href="/talks">talks</a><a href="https://www.dropbox.com/s/j8n1yd86dn00a41/cv.pdf?dl=1">CV</a><a href="/feed.xml">feed</a>
+    </nav>
+  </header>
+  </div> <!-- /.header-wrapper -->
+
+  <div class="content-wrapper">
+  <div id="content">
+    
+<article>
+  <header>
+    <h1>The perils of temporary object lifetimes in C++</h1>
+
+    <div class="meta">
+    
+written by Roman Podoliaka on
+
+<time datetime="2023-11-21T00:00:00+00:00">
+  November 21, 2023
+</time>
+
+
+
+
+
+    </div>
+  </header>
+
+  <p>Th other day my junior colleague asked me to help him troubleshoot a failing unit test: the
+actual value of a protocol buffer string field did not match<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> the expected value, and he
+couldn't understand why. Unfortunately, I'm not allowed to share the code, but it can be
+summarized using this contrived example:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="nf">foo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;Hello, World!&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string_view</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">foo</span><span class="p">()};</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>A seasoned C++ programmer will immediately spot the problem, but someone who have only used a
+memory-safe language like Java or Python in the past will be buffled why a seemingly trivial
+program above may or may not print the string <code>"Hello, World!\n"</code> depending on the chosen level
+of optimizations, the version of a compiler, operating system, etc.</p>
+<p>The issue, of course, is that <code>foo()</code> returns a <em>temporary</em> object whose lifetime ends too early:</p>
+<ul>
+<li>
+<p>unlike <code>std::string</code>, <code>std::string_view</code> does <em>not</em> allocate and own a dynamic array of <code>char</code>;
+  instead, it <em>references</em> a contiguous sequence of <code>char</code> somewhere in main memory. In this case,
+  that sequence is a dynamic array owned by the temporary <code>std::string</code> object</p>
+</li>
+<li>
+<p>this temporary object is destroyed right after the initialization of a <code>std::string_view</code> value,
+  i.e. the newly constructed <code>std::string_view</code> object immediately points to a memory region that
+  has already been freed<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> and, potentially, reused for something else</p>
+</li>
+</ul>
+<p>How would a junior programmer know they made a mistake like that? Would the compiler be able to help?
+I tried the latest versions of both clang++ and g++ available in Arch Linux, but neither complained
+about the code above:</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>clang++<span class="w"> </span>--version
+clang<span class="w"> </span>version<span class="w"> </span><span class="m">16</span>.0.6
+Target:<span class="w"> </span>x86_64-pc-linux-gnu
+Thread<span class="w"> </span>model:<span class="w"> </span>posix
+InstalledDir:<span class="w"> </span>/usr/bin
+$<span class="w"> </span>clang++<span class="w"> </span>example.cpp<span class="w"> </span>-o<span class="w"> </span>example<span class="w"> </span>-Wall<span class="w"> </span>-Werror<span class="w"> </span>-pedantic
+$
+
+$<span class="w"> </span>g++<span class="w"> </span>--version
+g++<span class="w"> </span><span class="o">(</span>GCC<span class="o">)</span><span class="w"> </span><span class="m">13</span>.2.1<span class="w"> </span><span class="m">20230801</span>
+Copyright<span class="w"> </span><span class="o">(</span>C<span class="o">)</span><span class="w"> </span><span class="m">2023</span><span class="w"> </span>Free<span class="w"> </span>Software<span class="w"> </span>Foundation,<span class="w"> </span>Inc.
+This<span class="w"> </span>is<span class="w"> </span>free<span class="w"> </span>software<span class="p">;</span><span class="w"> </span>see<span class="w"> </span>the<span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>copying<span class="w"> </span>conditions.<span class="w">  </span>There<span class="w"> </span>is<span class="w"> </span>NO
+warranty<span class="p">;</span><span class="w"> </span>not<span class="w"> </span>even<span class="w"> </span><span class="k">for</span><span class="w"> </span>MERCHANTABILITY<span class="w"> </span>or<span class="w"> </span>FITNESS<span class="w"> </span>FOR<span class="w"> </span>A<span class="w"> </span>PARTICULAR<span class="w"> </span>PURPOSE.
+$<span class="w"> </span>g++<span class="w"> </span>example.cpp<span class="w"> </span>-o<span class="w"> </span>example<span class="w"> </span>-Wall<span class="w"> </span>-Werror<span class="w"> </span>-pedantic<span class="w"> </span>-std<span class="o">=</span>c++17
+$
+</code></pre></div>
+
+<p>Interestingly, replacing <code>std::string_view bar = {foo()};</code> with <code>std::string_view bar = foo();</code> makes
+the difference, and clang++ is now able to generate a warning (that can be turned into an error if you
+compile the code with <code>-Werror</code>):</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>clang++<span class="w"> </span>example.cpp<span class="w"> </span>-o<span class="w"> </span>example<span class="w"> </span>-Wall<span class="w"> </span>-Werror<span class="w"> </span>-pedantic
+example.cpp:9:28:<span class="w"> </span>error:<span class="w"> </span>object<span class="w"> </span>backing<span class="w"> </span>the<span class="w"> </span>pointer<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>destroyed<span class="w"> </span>at<span class="w"> </span>the<span class="w"> </span>end<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>full-expression<span class="w"> </span><span class="o">[</span>-Werror,-Wdangling-gsl<span class="o">]</span>
+<span class="w">    </span>std::string_view<span class="w"> </span><span class="nv">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>foo<span class="o">()</span><span class="p">;</span>
+<span class="w">                           </span>^~~~~
+<span class="m">1</span><span class="w"> </span>error<span class="w"> </span>generated.
+</code></pre></div>
+
+<p><a href="https://en.cppreference.com/w/cpp/language/initialization">C++ initialization rules</a> are mind-boggling, but
+it looks like list-initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.</p>
+<p>Not all hope is lost, though. While it might be hard to detect this issue at <em>compile</em> time, it is certainly
+possible to do so at <em>runtime</em>. <a href="https://github.com/google/sanitizers/wiki/AddressSanitizer">AddressSanitizer</a>
+is a huge step forward and truly is a must have if you write C/C++ these days. Passing <code>-fsanitize=address</code> when
+compiling binaries using clang or GCC will add the necessary instrumentation to detect such errors. e.g.:</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>clang++<span class="w"> </span>example.cpp<span class="w"> </span>-o<span class="w"> </span>example<span class="w"> </span>-Wall<span class="w"> </span>-Werror<span class="w"> </span>-pedantic<span class="w"> </span>-fsanitize<span class="o">=</span>address<span class="w"> </span>-Og
+$<span class="w"> </span>./example
+<span class="o">=================================================================</span>
+<span class="o">==</span><span class="nv">736315</span><span class="o">==</span>ERROR:<span class="w"> </span>AddressSanitizer:<span class="w"> </span>stack-use-after-scope<span class="w"> </span>on<span class="w"> </span>address<span class="w"> </span>0x7f02cc000030<span class="w"> </span>at<span class="w"> </span>pc<span class="w"> </span>0x5593e0172d75<span class="w"> </span>bp<span class="w"> </span>0x7ffd78fc77b0<span class="w"> </span>sp<span class="w"> </span>0x7ffd78fc6f70
+READ<span class="w"> </span>of<span class="w"> </span>size<span class="w"> </span><span class="m">13</span><span class="w"> </span>at<span class="w"> </span>0x7f02cc000030<span class="w"> </span>thread<span class="w"> </span>T0
+<span class="w">    </span><span class="c1">#0 0x5593e0172d74 in __interceptor_fwrite.part.0 asan_interceptors.cpp.o</span>
+<span class="w">    </span><span class="c1">#1 0x7f02ce1489e4 in std::basic_streambuf&lt;char, std::char_traits&lt;char&gt;&gt;::sputn(char const*, long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/s</span>
+treambuf:458:28
+<span class="w">    </span><span class="c1">#2 0x7f02ce1489e4 in void std::__ostream_write&lt;char, std::char_traits&lt;char&gt;&gt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;&amp;, char const*, long) /usr/src/debug/gcc/gcc</span>
+-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/ostream_insert.h:53:52
+<span class="w">    </span><span class="c1">#3 0x7f02ce1489e4 in std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;&amp; std::__ostream_insert&lt;char, std::char_traits&lt;char&gt;&gt;(std::basic_ostream&lt;char, std::char_traits&lt;char</span>
+&gt;&gt;<span class="p">&amp;</span>,<span class="w"> </span>char<span class="w"> </span>const*,<span class="w"> </span>long<span class="o">)</span><span class="w"> </span>/usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/ostream_insert.h:104:18
+<span class="w">    </span><span class="c1">#4 0x5593e025a5a4 in main (/home/malor/sandbox/example+0x1575a4) (BuildId: 45fbcf1dea3ac1d2ea6dcc5217e757f7c29fc018)</span>
+<span class="w">    </span><span class="c1">#5 0x7f02cdd58ccf  (/usr/lib/libc.so.6+0x27ccf) (BuildId: 8bfe03f6bf9b6a6e2591babd0bbc266837d8f658)</span>
+<span class="w">    </span><span class="c1">#6 0x7f02cdd58d89 in __libc_start_main (/usr/lib/libc.so.6+0x27d89) (BuildId: 8bfe03f6bf9b6a6e2591babd0bbc266837d8f658)</span>
+<span class="w">    </span><span class="c1">#7 0x5593e01210d4 in _start (/home/malor/sandbox/example+0x1e0d4) (BuildId: 45fbcf1dea3ac1d2ea6dcc5217e757f7c29fc018)</span>
+
+Address<span class="w"> </span>0x7f02cc000030<span class="w"> </span>is<span class="w"> </span>located<span class="w"> </span><span class="k">in</span><span class="w"> </span>stack<span class="w"> </span>of<span class="w"> </span>thread<span class="w"> </span>T0<span class="w"> </span>at<span class="w"> </span>offset<span class="w"> </span><span class="m">48</span><span class="w"> </span><span class="k">in</span><span class="w"> </span>frame
+<span class="w">    </span><span class="c1">#0 0x5593e025a47f in main (/home/malor/sandbox/example+0x15747f) (BuildId: 45fbcf1dea3ac1d2ea6dcc5217e757f7c29fc018)</span>
+
+<span class="w">  </span>This<span class="w"> </span>frame<span class="w"> </span>has<span class="w"> </span><span class="m">1</span><span class="w"> </span>object<span class="o">(</span>s<span class="o">)</span>:
+<span class="w">    </span><span class="o">[</span><span class="m">32</span>,<span class="w"> </span><span class="m">64</span><span class="o">)</span><span class="w"> </span><span class="s1">&#39;ref.tmp&#39;</span><span class="w"> </span>&lt;<span class="o">==</span><span class="w"> </span>Memory<span class="w"> </span>access<span class="w"> </span>at<span class="w"> </span>offset<span class="w"> </span><span class="m">48</span><span class="w"> </span>is<span class="w"> </span>inside<span class="w"> </span>this<span class="w"> </span>variable
+HINT:<span class="w"> </span>this<span class="w"> </span>may<span class="w"> </span>be<span class="w"> </span>a<span class="w"> </span><span class="nb">false</span><span class="w"> </span>positive<span class="w"> </span><span class="k">if</span><span class="w"> </span>your<span class="w"> </span>program<span class="w"> </span>uses<span class="w"> </span>some<span class="w"> </span>custom<span class="w"> </span>stack<span class="w"> </span>unwind<span class="w"> </span>mechanism,<span class="w"> </span>swapcontext<span class="w"> </span>or<span class="w"> </span>vfork
+<span class="w">      </span><span class="o">(</span>longjmp<span class="w"> </span>and<span class="w"> </span>C++<span class="w"> </span>exceptions<span class="w"> </span>*are*<span class="w"> </span>supported<span class="o">)</span>
+SUMMARY:<span class="w"> </span>AddressSanitizer:<span class="w"> </span>stack-use-after-scope<span class="w"> </span>asan_interceptors.cpp.o<span class="w"> </span><span class="k">in</span><span class="w"> </span>__interceptor_fwrite.part.0
+</code></pre></div>
+
+<p>The catch is that the fauly code path must be triggered in order for AddressSanitizer to do its job.
+Hey, but that's why you should always write tests!</p>
+<p>It <em>is</em> amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
+with automatic memory management, or programming languages like Rust that can detect those at <em>compile</em> time.
+This also reminds me how old I am: we now have a whole new generation of programmers for whom automatic memory
+management is the norm, and those pesky C++ object lifetime rules are some anachronisms.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>In addition to a test failure, there was a warning about protocol buffer string serialization detecting
+an invalid UTF-8 sequence. When I pointed that out to my collegue (to hint that we were reading garbage memory
+somehow), it didn't trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
+won and it is now universally associated with the term Unicode or even "text" -- no one cares what encoding
+is used and how it works, as it's all UTF-8 these days.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Implementations of <code>std::string</code> in modern compilers will likely put a short string like that on the <em>stack</em>,
+but even if <em>heap</em> is not used, the outcome is the same -- <code>std::string_view</code> references memory that can already be
+used for something else.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+  <footer>
+  
+  
+  </footer>
+</article>
+
+  </div> <!-- /#content -->
+  </div> <!-- /.content-wrapper -->
+
+  <div class="footer-wrapper">
+  <footer class="footer">
+    <p>&copy; 2023 Roman Podoliaka
+</p>
+  </footer>
+  </div> <!-- /.footer-wrapper -->
+
+  
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37812430-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- /Google Analytics -->
