@@ -2,7 +2,7 @@
   <feed xmlns="http://www.w3.org/2005/Atom" >
     <title>Roman Podoliaka's Blog</title>
 
-    <updated>2023-11-21T22:18:13Z</updated>
+    <updated>2023-11-21T22:22:02Z</updated>
     <id>http://podoliaka.org/</id>
 
     <link href="http://podoliaka.org/feed.xml" rel="self" />
@@ -17,7 +17,7 @@
       <id>http://podoliaka.org//2023/11/21/cpp-lifetimes/</id>
 
       <published>2023-11-21T00:00:00+00:00</published>
-      <updated>2023-11-21T22:18:00.867182+00:00</updated>
+      <updated>2023-11-21T22:21:52.235157+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -155,7 +155,7 @@ used for something else.&amp;#160;&lt;a class=&#34;footnote-backref&#34; href=&#
       <id>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</id>
 
       <published>2016-04-10T00:00:00+00:00</published>
-      <updated>2023-11-21T22:18:00.867182+00:00</updated>
+      <updated>2023-11-21T22:21:52.235157+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -740,7 +740,7 @@ when virtual environments are used.&lt;/p&gt;
       <id>http://podoliaka.org//2013/02/24/stringconcat-en/</id>
 
       <published>2013-02-24T00:00:00+00:00</published>
-      <updated>2023-11-21T22:18:00.867182+00:00</updated>
+      <updated>2023-11-21T22:21:52.235157+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -864,7 +864,7 @@ task queue in &lt;code&gt;Python&lt;/code&gt; programs might want to check it ou
       <id>http://podoliaka.org//2013/01/20/iterators-en/</id>
 
       <published>2013-01-20T00:00:00+00:00</published>
-      <updated>2023-11-21T22:18:00.867182+00:00</updated>
+      <updated>2023-11-21T22:21:52.235157+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
