@@ -121,7 +121,7 @@ it looks like list-initialization somehow throws clang++ off, while diagnostics 
 <p>Not all hope is lost, though. While it might be hard to detect this issue at <em>compile</em> time, it is certainly
 possible to do so at <em>runtime</em>. <a href="https://github.com/google/sanitizers/wiki/AddressSanitizer">AddressSanitizer</a>
 is a huge step forward and truly is a must have if you write C/C++ these days. Passing <code>-fsanitize=address</code> when
-compiling binaries using clang or GCC will add the necessary instrumentation to detect such errors. e.g.:</p>
+compiling binaries using clang or GCC will add the necessary instrumentation to detect such errors, for example:</p>
 <div class="codehilite"><pre><span></span><code>$<span class="w"> </span>clang++<span class="w"> </span>example.cpp<span class="w"> </span>-o<span class="w"> </span>example<span class="w"> </span>-Wall<span class="w"> </span>-Werror<span class="w"> </span>-pedantic<span class="w"> </span>-fsanitize<span class="o">=</span>address<span class="w"> </span>-Og
 $<span class="w"> </span>./example
 <span class="o">=================================================================</span>
