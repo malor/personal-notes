@@ -2,7 +2,7 @@
   <feed xmlns="http://www.w3.org/2005/Atom" >
     <title>Roman Podoliaka's Blog</title>
 
-    <updated>2023-11-21T21:55:58Z</updated>
+    <updated>2023-11-21T21:58:49Z</updated>
     <id>http://podoliaka.org/</id>
 
     <link href="http://podoliaka.org/feed.xml" rel="self" />
@@ -17,7 +17,7 @@
       <id>http://podoliaka.org//2023/11/21/cpp-lifetimes/</id>
 
       <published>2023-11-21T00:00:00+00:00</published>
-      <updated>2023-11-21T21:55:48.638367+00:00</updated>
+      <updated>2023-11-21T21:58:39.066627+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -44,7 +44,7 @@ summarized using this contrived example:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;A seasoned C++ programmer will immediately spot the problem, but someone who have only used a
-memory-safe language like Java or Python in the past will be buffled why a seemingly trivial
+memory-safe language like Java or Python in the past will be baffled why a seemingly trivial
 program above may or may not print the string &lt;code&gt;&#34;Hello, World!\n&#34;&lt;/code&gt; depending on the chosen level
 of optimizations, the version of a compiler, operating system, etc.&lt;/p&gt;
 &lt;p&gt;The issue, of course, is that &lt;code&gt;foo()&lt;/code&gt; returns a &lt;em&gt;temporary&lt;/em&gt; object whose lifetime ends too early:&lt;/p&gt;
@@ -123,7 +123,7 @@ HINT:&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;this&lt;span class=&#34;w&#34;&
 SUMMARY:&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;AddressSanitizer:&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;stack-use-after-scope&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;asan_interceptors.cpp.o&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;k&#34;&gt;in&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;__interceptor_fwrite.part.0
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;The catch is that the fauly code path must be triggered in order for AddressSanitizer to do its job.
+&lt;p&gt;The catch is that the faulty code path must be triggered in order for AddressSanitizer to do its job.
 Hey, but that&#39;s why you should always write tests!&lt;/p&gt;
 &lt;p&gt;It &lt;em&gt;is&lt;/em&gt; amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
 with automatic memory management, or programming languages like Rust that can detect those at &lt;em&gt;compile&lt;/em&gt; time.
@@ -134,7 +134,7 @@ management is the norm, and those pesky C++ object lifetime rules are some anach
 &lt;ol&gt;
 &lt;li id=&#34;fn:1&#34;&gt;
 &lt;p&gt;In addition to a test failure, there was a warning about protocol buffer string serialization detecting
-an invalid UTF-8 sequence. When I pointed that out to my collegue (to hint that we were reading garbage memory
+an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
 somehow), it didn&#39;t trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
 won and it is now universally associated with the term Unicode or even &#34;text&#34; -- no one cares what encoding
 is used and how it works, as it&#39;s all UTF-8 these days.&amp;#160;&lt;a class=&#34;footnote-backref&#34; href=&#34;#fnref:1&#34; title=&#34;Jump back to footnote 1 in the text&#34;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
@@ -155,7 +155,7 @@ used for something else.&amp;#160;&lt;a class=&#34;footnote-backref&#34; href=&#
       <id>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</id>
 
       <published>2016-04-10T00:00:00+00:00</published>
-      <updated>2023-11-21T21:55:48.638367+00:00</updated>
+      <updated>2023-11-21T21:58:39.066627+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -740,7 +740,7 @@ when virtual environments are used.&lt;/p&gt;
       <id>http://podoliaka.org//2013/02/24/stringconcat-en/</id>
 
       <published>2013-02-24T00:00:00+00:00</published>
-      <updated>2023-11-21T21:55:48.638367+00:00</updated>
+      <updated>2023-11-21T21:58:39.066627+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -864,7 +864,7 @@ task queue in &lt;code&gt;Python&lt;/code&gt; programs might want to check it ou
       <id>http://podoliaka.org//2013/01/20/iterators-en/</id>
 
       <published>2013-01-20T00:00:00+00:00</published>
-      <updated>2023-11-21T21:55:48.638367+00:00</updated>
+      <updated>2023-11-21T21:58:39.066627+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>

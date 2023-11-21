@@ -70,7 +70,7 @@ summarized using this contrived example:</p>
 </code></pre></div>
 
 <p>A seasoned C++ programmer will immediately spot the problem, but someone who have only used a
-memory-safe language like Java or Python in the past will be buffled why a seemingly trivial
+memory-safe language like Java or Python in the past will be baffled why a seemingly trivial
 program above may or may not print the string <code>"Hello, World!\n"</code> depending on the chosen level
 of optimizations, the version of a compiler, operating system, etc.</p>
 <p>The issue, of course, is that <code>foo()</code> returns a <em>temporary</em> object whose lifetime ends too early:</p>
@@ -149,7 +149,7 @@ HINT:<span class="w"> </span>this<span class="w"> </span>may<span class="w"> </s
 SUMMARY:<span class="w"> </span>AddressSanitizer:<span class="w"> </span>stack-use-after-scope<span class="w"> </span>asan_interceptors.cpp.o<span class="w"> </span><span class="k">in</span><span class="w"> </span>__interceptor_fwrite.part.0
 </code></pre></div>
 
-<p>The catch is that the fauly code path must be triggered in order for AddressSanitizer to do its job.
+<p>The catch is that the faulty code path must be triggered in order for AddressSanitizer to do its job.
 Hey, but that's why you should always write tests!</p>
 <p>It <em>is</em> amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
 with automatic memory management, or programming languages like Rust that can detect those at <em>compile</em> time.
@@ -160,7 +160,7 @@ management is the norm, and those pesky C++ object lifetime rules are some anach
 <ol>
 <li id="fn:1">
 <p>In addition to a test failure, there was a warning about protocol buffer string serialization detecting
-an invalid UTF-8 sequence. When I pointed that out to my collegue (to hint that we were reading garbage memory
+an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
 somehow), it didn't trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
 won and it is now universally associated with the term Unicode or even "text" -- no one cares what encoding
 is used and how it works, as it's all UTF-8 these days.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
