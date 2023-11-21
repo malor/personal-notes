@@ -32,9 +32,9 @@ Short bio:
 Contact
 -------
 
-If you want to reach out to me, you're welcome to send an [E-mail] or follow me on [Twitter],
+If you want to reach out to me, you're welcome to send an [E-mail] or follow me on [Mastodon],
 or [GitHub].
 
 [E-mail]: mailto:roman.podoliaka@gmail.com
-[Twitter]: https://twitter.com/rpodoliaka
+[Mastodon]: https://techhub.social/@rpodoliaka
 [GitHub]: https://github.com/malor
