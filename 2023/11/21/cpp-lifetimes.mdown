@@ -3,8 +3,8 @@ The perils of temporary object lifetimes in C++
 
 The other day my junior colleague asked me to help him troubleshoot a failing unit test: the
 actual value of a protocol buffer string field did not match[^1] the expected value, and he
-couldn't understand why. Unfortunately, I'm not allowed to share the code, but it can be
-summarized using this contrived example:
+couldn't figure out why. I'm not allowed to share that code, but it can be summarized using
+this contrived example:
 
 ```cpp
 #include <iostream>
@@ -29,17 +29,17 @@ level of optimizations, the version of a compiler, operating system, etc.
 
 The issue, of course, is that `foo()` returns a _temporary_ object whose lifetime ends too early:
 
-* unlike `std::string`, `std::string_view` does _not_ allocate and own a dynamic array of `char`;
-  instead, it _references_ a contiguous sequence of `char` somewhere in main memory. In this case,
-  that sequence is a dynamic array owned by the temporary `std::string` object
+* unlike `std::string`, `std::string_view` does _not_ allocate and own a dynamic array of `char`s;
+  instead, it _references_ a contiguous sequence of `char`s somewhere in main memory. In this case,
+  that sequence is a dynamic array owned by a temporary `std::string` object
 
-* this temporary object is destroyed right after the initialization of a `std::string_view` value,
-  and so the newly constructed `std::string_view` object immediately points to a memory region that
-  has already been freed and, potentially, reused for something else
+* this temporary object is destroyed right after initialization of a `std::string_view` value, and
+  so the newly constructed `std::string_view` object immediately points to a memory region that
+  has already been freed and, potentially, reused for storing something else
 
 How would a junior programmer know they made a mistake like that? Would the compiler be able to help?
-I tried the latest versions of both clang++ and g++ available in Arch Linux, but neither complained
-about the code above:
+I tried the latest versions of clang++ and g++ available in Arch Linux, but neither complained about
+the code above:
 
 ```shell
 $ clang++ --version
@@ -72,7 +72,7 @@ example.cpp:9:28: error: object backing the pointer will be destroyed at the end
 ```
 
 [C++ initialization rules](https://en.cppreference.com/w/cpp/language/initialization) are mind-boggling, but
-it looks like list-initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.
+it looks like aggregate initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.
 
 Not all hope is lost, though. While it might be hard to detect this issue at _compile_ time, it is certainly
 possible to do so at _runtime_. [AddressSanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer)
@@ -158,7 +158,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 AddressSanitizer detected the issue at runtime and immediately aborted execution of the program.
 Its output will contain the following information:
 
-* the type of a memory error and where it happened. In this case, it's `heap-use-after-free`[^2] that
+* the type of a memory error and where it happened. In this case, it is `heap-use-after-free`[^2] that
   is triggered inside `operator<<()` which tries to access already freed memory through a dangling pointer
 
 * where in the code this memory block was previously allocated and deallocated
@@ -174,12 +174,12 @@ Hey, but that's why you should always write tests!
 
 It _is_ amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
 with automatic memory management, or programming languages like Rust that can detect those at _compile_ time.
-This also reminds me how old I am: we now have a whole new generation of programmers for whom automatic memory
+This also reminds me of how old I am: we now have a whole new generation of programmers for whom automatic memory
 management is the norm, and those pesky C++ object lifetime rules are some anachronisms.
 
-[^1]: In addition to a test failure, there was a warning about protocol buffer string serialization detecting
+[^1]: In addition to the test failure, there was a warning about protocol buffer string serialization detecting
 an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
-somehow), it didn't trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
+somehow), it didn't trigger any reaction. I now realize that we live in the world where UTF-8 has officially
 won and it is now universally associated with the term Unicode or even "text" -- no one cares what encoding
 is used and how it works, as it's all UTF-8 these days.
 
