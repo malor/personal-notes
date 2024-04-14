@@ -2,7 +2,7 @@
   <feed xmlns="http://www.w3.org/2005/Atom" >
     <title>Roman Podoliaka's Blog</title>
 
-    <updated>2023-11-22T20:59:23Z</updated>
+    <updated>2024-04-14T18:28:30Z</updated>
     <id>http://podoliaka.org/</id>
 
     <link href="http://podoliaka.org/feed.xml" rel="self" />
@@ -17,7 +17,7 @@
       <id>http://podoliaka.org//2023/11/21/cpp-lifetimes/</id>
 
       <published>2023-11-21T00:00:00+00:00</published>
-      <updated>2023-11-22T20:59:12.632036+00:00</updated>
+      <updated>2024-04-14T18:28:18.741687+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -26,8 +26,8 @@
       <content type="html">
         &lt;p&gt;The other day my junior colleague asked me to help him troubleshoot a failing unit test: the
 actual value of a protocol buffer string field did not match&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a class=&#34;footnote-ref&#34; href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; the expected value, and he
-couldn&#39;t understand why. Unfortunately, I&#39;m not allowed to share the code, but it can be
-summarized using this contrived example:&lt;/p&gt;
+couldn&#39;t figure out why. I&#39;m not allowed to share that code, but it can be summarized using
+this contrived example:&lt;/p&gt;
 &lt;div class=&#34;codehilite&#34;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;cpf&#34;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;
 &lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;cpf&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;
 
@@ -50,19 +50,19 @@ level of optimizations, the version of a compiler, operating system, etc.&lt;/p&
 &lt;p&gt;The issue, of course, is that &lt;code&gt;foo()&lt;/code&gt; returns a &lt;em&gt;temporary&lt;/em&gt; object whose lifetime ends too early:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;unlike &lt;code&gt;std::string&lt;/code&gt;, &lt;code&gt;std::string_view&lt;/code&gt; does &lt;em&gt;not&lt;/em&gt; allocate and own a dynamic array of &lt;code&gt;char&lt;/code&gt;;
-  instead, it &lt;em&gt;references&lt;/em&gt; a contiguous sequence of &lt;code&gt;char&lt;/code&gt; somewhere in main memory. In this case,
-  that sequence is a dynamic array owned by the temporary &lt;code&gt;std::string&lt;/code&gt; object&lt;/p&gt;
+&lt;p&gt;unlike &lt;code&gt;std::string&lt;/code&gt;, &lt;code&gt;std::string_view&lt;/code&gt; does &lt;em&gt;not&lt;/em&gt; allocate and own a dynamic array of &lt;code&gt;char&lt;/code&gt;s;
+  instead, it &lt;em&gt;references&lt;/em&gt; a contiguous sequence of &lt;code&gt;char&lt;/code&gt;s somewhere in main memory. In this case,
+  that sequence is a dynamic array owned by a temporary &lt;code&gt;std::string&lt;/code&gt; object&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;this temporary object is destroyed right after the initialization of a &lt;code&gt;std::string_view&lt;/code&gt; value,
-  and so the newly constructed &lt;code&gt;std::string_view&lt;/code&gt; object immediately points to a memory region that
-  has already been freed and, potentially, reused for something else&lt;/p&gt;
+&lt;p&gt;this temporary object is destroyed right after initialization of a &lt;code&gt;std::string_view&lt;/code&gt; value, and
+  so the newly constructed &lt;code&gt;std::string_view&lt;/code&gt; object immediately points to a memory region that
+  has already been freed and, potentially, reused for storing something else&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;How would a junior programmer know they made a mistake like that? Would the compiler be able to help?
-I tried the latest versions of both clang++ and g++ available in Arch Linux, but neither complained
-about the code above:&lt;/p&gt;
+I tried the latest versions of clang++ and g++ available in Arch Linux, but neither complained about
+the code above:&lt;/p&gt;
 &lt;div class=&#34;codehilite&#34;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;clang++&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;--version
 clang&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;version&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;m&#34;&gt;16&lt;/span&gt;.0.6
 Target:&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;x86_64-pc-linux-gnu
@@ -91,7 +91,7 @@ example.cpp:9:28:&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;error:&lt;span clas
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://en.cppreference.com/w/cpp/language/initialization&#34;&gt;C++ initialization rules&lt;/a&gt; are mind-boggling, but
-it looks like list-initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.&lt;/p&gt;
+it looks like aggregate initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.&lt;/p&gt;
 &lt;p&gt;Not all hope is lost, though. While it might be hard to detect this issue at &lt;em&gt;compile&lt;/em&gt; time, it is certainly
 possible to do so at &lt;em&gt;runtime&lt;/em&gt;. &lt;a href=&#34;https://github.com/google/sanitizers/wiki/AddressSanitizer&#34;&gt;AddressSanitizer&lt;/a&gt;
 is a huge step forward and truly is a must have if you write C/C++ these days. Passing &lt;code&gt;-fsanitize=address&lt;/code&gt; when
@@ -175,7 +175,7 @@ Shadow&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;byte&lt;span class=&#34;w&#34;
 Its output will contain the following information:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;the type of a memory error and where it happened. In this case, it&#39;s &lt;code&gt;heap-use-after-free&lt;/code&gt;&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a class=&#34;footnote-ref&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; that
+&lt;p&gt;the type of a memory error and where it happened. In this case, it is &lt;code&gt;heap-use-after-free&lt;/code&gt;&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a class=&#34;footnote-ref&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; that
   is triggered inside &lt;code&gt;operator&amp;lt;&amp;lt;()&lt;/code&gt; which tries to access already freed memory through a dangling pointer&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
@@ -192,15 +192,15 @@ Its output will contain the following information:&lt;/p&gt;
 Hey, but that&#39;s why you should always write tests!&lt;/p&gt;
 &lt;p&gt;It &lt;em&gt;is&lt;/em&gt; amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
 with automatic memory management, or programming languages like Rust that can detect those at &lt;em&gt;compile&lt;/em&gt; time.
-This also reminds me how old I am: we now have a whole new generation of programmers for whom automatic memory
+This also reminds me of how old I am: we now have a whole new generation of programmers for whom automatic memory
 management is the norm, and those pesky C++ object lifetime rules are some anachronisms.&lt;/p&gt;
 &lt;div class=&#34;footnote&#34;&gt;
 &lt;hr /&gt;
 &lt;ol&gt;
 &lt;li id=&#34;fn:1&#34;&gt;
-&lt;p&gt;In addition to a test failure, there was a warning about protocol buffer string serialization detecting
+&lt;p&gt;In addition to the test failure, there was a warning about protocol buffer string serialization detecting
 an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
-somehow), it didn&#39;t trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
+somehow), it didn&#39;t trigger any reaction. I now realize that we live in the world where UTF-8 has officially
 won and it is now universally associated with the term Unicode or even &#34;text&#34; -- no one cares what encoding
 is used and how it works, as it&#39;s all UTF-8 these days.&amp;#160;&lt;a class=&#34;footnote-backref&#34; href=&#34;#fnref:1&#34; title=&#34;Jump back to footnote 1 in the text&#34;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -221,7 +221,7 @@ might already be used for storing something else. AddressSanitizer would detect 
       <id>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</id>
 
       <published>2016-04-10T00:00:00+00:00</published>
-      <updated>2023-11-22T20:59:12.632036+00:00</updated>
+      <updated>2024-04-14T18:28:18.741687+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -806,7 +806,7 @@ when virtual environments are used.&lt;/p&gt;
       <id>http://podoliaka.org//2013/02/24/stringconcat-en/</id>
 
       <published>2013-02-24T00:00:00+00:00</published>
-      <updated>2023-11-22T20:59:12.632036+00:00</updated>
+      <updated>2024-04-14T18:28:18.741687+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>
@@ -930,7 +930,7 @@ task queue in &lt;code&gt;Python&lt;/code&gt; programs might want to check it ou
       <id>http://podoliaka.org//2013/01/20/iterators-en/</id>
 
       <published>2013-01-20T00:00:00+00:00</published>
-      <updated>2023-11-22T20:59:12.632036+00:00</updated>
+      <updated>2024-04-14T18:28:18.741687+00:00</updated>
 
       <author>
         <name>Roman Podoliaka</name>

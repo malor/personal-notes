@@ -52,8 +52,8 @@ written by Roman Podoliaka on
 
   <p>The other day my junior colleague asked me to help him troubleshoot a failing unit test: the
 actual value of a protocol buffer string field did not match<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> the expected value, and he
-couldn't understand why. Unfortunately, I'm not allowed to share the code, but it can be
-summarized using this contrived example:</p>
+couldn't figure out why. I'm not allowed to share that code, but it can be summarized using
+this contrived example:</p>
 <div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 
@@ -76,19 +76,19 @@ level of optimizations, the version of a compiler, operating system, etc.</p>
 <p>The issue, of course, is that <code>foo()</code> returns a <em>temporary</em> object whose lifetime ends too early:</p>
 <ul>
 <li>
-<p>unlike <code>std::string</code>, <code>std::string_view</code> does <em>not</em> allocate and own a dynamic array of <code>char</code>;
-  instead, it <em>references</em> a contiguous sequence of <code>char</code> somewhere in main memory. In this case,
-  that sequence is a dynamic array owned by the temporary <code>std::string</code> object</p>
+<p>unlike <code>std::string</code>, <code>std::string_view</code> does <em>not</em> allocate and own a dynamic array of <code>char</code>s;
+  instead, it <em>references</em> a contiguous sequence of <code>char</code>s somewhere in main memory. In this case,
+  that sequence is a dynamic array owned by a temporary <code>std::string</code> object</p>
 </li>
 <li>
-<p>this temporary object is destroyed right after the initialization of a <code>std::string_view</code> value,
-  and so the newly constructed <code>std::string_view</code> object immediately points to a memory region that
-  has already been freed and, potentially, reused for something else</p>
+<p>this temporary object is destroyed right after initialization of a <code>std::string_view</code> value, and
+  so the newly constructed <code>std::string_view</code> object immediately points to a memory region that
+  has already been freed and, potentially, reused for storing something else</p>
 </li>
 </ul>
 <p>How would a junior programmer know they made a mistake like that? Would the compiler be able to help?
-I tried the latest versions of both clang++ and g++ available in Arch Linux, but neither complained
-about the code above:</p>
+I tried the latest versions of clang++ and g++ available in Arch Linux, but neither complained about
+the code above:</p>
 <div class="codehilite"><pre><span></span><code>$<span class="w"> </span>clang++<span class="w"> </span>--version
 clang<span class="w"> </span>version<span class="w"> </span><span class="m">16</span>.0.6
 Target:<span class="w"> </span>x86_64-pc-linux-gnu
@@ -117,7 +117,7 @@ example.cpp:9:28:<span class="w"> </span>error:<span class="w"> </span>object<sp
 </code></pre></div>
 
 <p><a href="https://en.cppreference.com/w/cpp/language/initialization">C++ initialization rules</a> are mind-boggling, but
-it looks like list-initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.</p>
+it looks like aggregate initialization somehow throws clang++ off, while diagnostics in g++ are even weaker.</p>
 <p>Not all hope is lost, though. While it might be hard to detect this issue at <em>compile</em> time, it is certainly
 possible to do so at <em>runtime</em>. <a href="https://github.com/google/sanitizers/wiki/AddressSanitizer">AddressSanitizer</a>
 is a huge step forward and truly is a must have if you write C/C++ these days. Passing <code>-fsanitize=address</code> when
@@ -201,7 +201,7 @@ Shadow<span class="w"> </span>byte<span class="w"> </span>legend<span class="w">
 Its output will contain the following information:</p>
 <ul>
 <li>
-<p>the type of a memory error and where it happened. In this case, it's <code>heap-use-after-free</code><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> that
+<p>the type of a memory error and where it happened. In this case, it is <code>heap-use-after-free</code><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> that
   is triggered inside <code>operator&lt;&lt;()</code> which tries to access already freed memory through a dangling pointer</p>
 </li>
 <li>
@@ -218,15 +218,15 @@ Its output will contain the following information:</p>
 Hey, but that's why you should always write tests!</p>
 <p>It <em>is</em> amazing to me how easy it is to make a mistake like that in C++ compared to programming languages
 with automatic memory management, or programming languages like Rust that can detect those at <em>compile</em> time.
-This also reminds me how old I am: we now have a whole new generation of programmers for whom automatic memory
+This also reminds me of how old I am: we now have a whole new generation of programmers for whom automatic memory
 management is the norm, and those pesky C++ object lifetime rules are some anachronisms.</p>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>In addition to a test failure, there was a warning about protocol buffer string serialization detecting
+<p>In addition to the test failure, there was a warning about protocol buffer string serialization detecting
 an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
-somehow), it didn't trigger any reaction. I now realize that we are living in the world where UTF-8 has officially
+somehow), it didn't trigger any reaction. I now realize that we live in the world where UTF-8 has officially
 won and it is now universally associated with the term Unicode or even "text" -- no one cares what encoding
 is used and how it works, as it's all UTF-8 these days.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
