@@ -70,9 +70,9 @@ this contrived example:</p>
 </code></pre></div>
 
 <p>A seasoned C++ programmer will immediately spot the problem, but someone who have only used a
-memory-safe language like Java or Python in the past will be baffled why a seemingly trivial
-program above may or may not print the string <code>"Hello, programmer!\n"</code> depending on the chosen
-level of optimizations, the version of a compiler, operating system, etc.</p>
+memory-safe language like Java or Python before will be baffled why a seemingly trivial program
+above may or may not print the string <code>"Hello, programmer!\n"</code> depending on the chosen level of
+optimizations, the version of a compiler, operating system, etc.</p>
 <p>The issue, of course, is that <code>foo()</code> returns a <em>temporary</em> object whose lifetime ends too early:</p>
 <ul>
 <li>

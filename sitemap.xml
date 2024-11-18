@@ -2,81 +2,81 @@
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
       <loc>http://podoliaka.org//talks/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//about/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//2013/01/20/iterators-en/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//2013/02/24/stringconcat-en/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//talks/profiling/reveal.js/README/</loc>
-      <lastmod>2024-04-14T18:28:18.797687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//talks/profiling/reveal.js/CONTRIBUTING/</loc>
-      <lastmod>2024-04-14T18:28:18.797687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//talks/profiling/reveal.js/css/theme/README/</loc>
-      <lastmod>2024-04-14T18:28:18.797687+00:00</lastmod>
-    </url>
-  
-    <url>
-      <loc>http://podoliaka.org//talks/profiling/reveal.js/plugin/markdown/example/</loc>
-      <lastmod>2024-04-14T18:28:18.809687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//talks/gdbdebugging/pyconpl-slides/</loc>
-      <lastmod>2024-04-14T18:28:18.765687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.506580+00:00</lastmod>
     </url>
   
     <url>
-      <loc>http://podoliaka.org//talks/autotesting/reveal.js/README/</loc>
-      <lastmod>2024-04-14T18:28:18.745687+00:00</lastmod>
+      <loc>http://podoliaka.org//talks/profiling/reveal.js/CONTRIBUTING/</loc>
+      <lastmod>2024-11-18T09:07:21.538580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//talks/profiling/reveal.js/README/</loc>
+      <lastmod>2024-11-18T09:07:21.538580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//talks/profiling/reveal.js/plugin/markdown/example/</loc>
+      <lastmod>2024-11-18T09:07:21.554580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//talks/profiling/reveal.js/css/theme/README/</loc>
+      <lastmod>2024-11-18T09:07:21.542580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//talks/autotesting/reveal.js/CONTRIBUTING/</loc>
-      <lastmod>2024-04-14T18:28:18.745687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.490580+00:00</lastmod>
     </url>
   
     <url>
-      <loc>http://podoliaka.org//talks/autotesting/reveal.js/css/theme/README/</loc>
-      <lastmod>2024-04-14T18:28:18.745687+00:00</lastmod>
+      <loc>http://podoliaka.org//talks/autotesting/reveal.js/README/</loc>
+      <lastmod>2024-11-18T09:07:21.490580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//talks/autotesting/reveal.js/plugin/markdown/example/</loc>
-      <lastmod>2024-04-14T18:28:18.761687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.502580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//talks/autotesting/reveal.js/css/theme/README/</loc>
+      <lastmod>2024-11-18T09:07:21.490580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//talks/enginefacade/slides/</loc>
-      <lastmod>2024-04-14T18:28:18.761687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.506580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//2013/02/24/stringconcat-en/</loc>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//2013/01/20/iterators-en/</loc>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
     </url>
   
     <url>
       <loc>http://podoliaka.org//2023/11/21/cpp-lifetimes/</loc>
-      <lastmod>2024-04-14T18:28:18.741687+00:00</lastmod>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
+    </url>
+  
+    <url>
+      <loc>http://podoliaka.org//2016/04/10/debugging-cpython-gdb/</loc>
+      <lastmod>2024-11-18T09:07:21.486580+00:00</lastmod>
     </url>
   </urlset>

@@ -619,6 +619,24 @@ calls to native libraries. On modern Linux distros debugging CPython processes
 with <code>gdb</code> must be as simple as installing of debugging symbols for the
 concrete interpreter build, although there are a few known gotchas, especially
 when virtual environments are used.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>In addition to the test failure, there was a warning about protocol buffer string serialization detecting
+an invalid UTF-8 sequence. When I pointed that out to my colleague (to hint that we were reading garbage memory
+somehow), it didn't trigger any reaction. I now realize that we live in the world where UTF-8 has officially
+won and it is now universally associated with the term Unicode or even "text" -- no one cares what encoding
+is used and how it works, as it's all UTF-8 these days.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>The string value in the example above was carefully chosen to trigger this specific kind of a memory error.
+Modern implementations of <code>std::string</code> will store shorter strings on the stack, and heap won't be used at all.
+This does not change the outcome, though: either way <code>std::string_view</code> would be referencing a memory block that
+might already be used for storing something else. AddressSanitizer would detect that as <code>stack-use-after-scope</code>.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
   <footer>
   
