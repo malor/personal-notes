@@ -10,7 +10,7 @@ Hey! I'm Roman, a software engineer from Ukraine who currently lives in Ireland.
 My programming language of choice is Python, as it allows me to be efficient and easily
 express my thoughts. I used to do some C / C++ / Java programming in the past and keep using
 those languages, but usually only when I need to read or modify someone else's code.
-I'm also a big fan of Rust and Clojure and use them occassionally for various pet projects.
+I'm also a big fan of Rust and Clojure and use them occasionally for various pet projects.
 
 My main areas of expertise are:
 
