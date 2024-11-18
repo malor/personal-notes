@@ -23,9 +23,9 @@ int main() {
 ```
 
 A seasoned C++ programmer will immediately spot the problem, but someone who have only used a
-memory-safe language like Java or Python in the past will be baffled why a seemingly trivial
-program above may or may not print the string `"Hello, programmer!\n"` depending on the chosen
-level of optimizations, the version of a compiler, operating system, etc.
+memory-safe language like Java or Python before will be baffled why a seemingly trivial program
+above may or may not print the string `"Hello, programmer!\n"` depending on the chosen level of
+optimizations, the version of a compiler, operating system, etc.
 
 The issue, of course, is that `foo()` returns a _temporary_ object whose lifetime ends too early:
 
